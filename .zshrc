@@ -1,12 +1,16 @@
-source /usr/local/share/antigen/antigen.zsh
+ANTIGEN="$(brew --prefix antigen)/share/antigen/antigen.zsh"
 
-antigen use oh-my-zsh
+if [ -f "$ANTIGEN" ]; then
+    source $(brew --prefix antigen)/share/antigen/antigen.zsh
 
-antigen bundle git
+    antigen use oh-my-zsh
 
-antigen bundle zsh-users/zsh-autosuggestions
-antigen bundle zsh-users/zsh-syntax-highlighting
+    antigen bundle git
 
-antigen theme robbyrussell
+    antigen bundle zsh-users/zsh-autosuggestions
+    antigen bundle zsh-users/zsh-syntax-highlighting
 
-antigen apply
+    antigen theme robbyrussell
+
+    antigen apply
+fi

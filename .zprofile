@@ -1,4 +1,18 @@
-(nohup gpgconf --launch gpg-agent &> /dev/null &)
+if (( $+commands[brew] )); then
+    eval "$(brew shellenv)"
+    export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
+fi
 
-eval "$(rbenv init -)"
-eval "$(nodenv init -)"
+if (( $+commands[gpgconf] )); then
+    (nohup gpgconf --launch gpg-agent &> /dev/null &)
+    unset SSH_AGENT_PID
+    export SSH_AUTH_SOCK=$HOME/.gnupg/S.gpg-agent.ssh
+fi
+
+if (( $+commands[rbenv] )); then
+    eval "$(rbenv init -)"
+fi
+
+if (( $+commands[nodenv] )); then
+    eval "$(nodenv init -)"
+fi
