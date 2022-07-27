@@ -1,7 +1,7 @@
 ANTIGEN="$(brew --prefix antigen)/share/antigen/antigen.zsh"
 
 if [ -f "$ANTIGEN" ]; then
-    source $(brew --prefix antigen)/share/antigen/antigen.zsh
+    source $ANTIGEN
 
     antigen use oh-my-zsh
 
