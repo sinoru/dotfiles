@@ -1,16 +1,22 @@
-ANTIGEN="$(brew --prefix antigen)/share/antigen/antigen.zsh"
+ANTIDOTE="$(brew --prefix antidote)/share/antidote/antidote.zsh"
 
-if [ -f "$ANTIGEN" ]; then
-    source $ANTIGEN
+if [ -f "$ANTIDOTE" ]; then
+    source $ANTIDOTE
 
-    antigen use oh-my-zsh
+    source <(antidote init)
 
-    antigen bundle git
+    antidote bundle zsh-users/zsh-autosuggestions
+    antidote bundle zsh-users/zsh-completions
 
-    antigen bundle zsh-users/zsh-autosuggestions
-    antigen bundle zsh-users/zsh-syntax-highlighting
+    antidote bundle mattmc3/zephyr
+    antidote bundle mattmc3/zephyr path:plugins/autosuggestions
+    antidote bundle mattmc3/zephyr path:plugins/syntax-highlighting
 
-    antigen theme robbyrussell
+    antidote bundle ohmyzsh/ohmyzsh path:lib
+    antidote bundle ohmyzsh/ohmyzsh path:plugins/git
+    antidote bundle ohmyzsh/ohmyzsh path:plugins/extract
 
-    antigen apply
+    antidote bundle mattmc3/zephyr path:plugins/completions
+
+    antidote bundle ohmyzsh/ohmyzsh path:themes/robbyrussell.zsh-theme
 fi

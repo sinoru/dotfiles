@@ -1,5 +1,11 @@
+# Set PATH, MANPATH, etc., for Homebrew.
+if [ -x /opt/homebrew/bin/brew  ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [ -x /usr/local/bin/brew ]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+fi
+
 if (( $+commands[brew] )); then
-    eval "$(brew shellenv)"
     export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
 fi
 
