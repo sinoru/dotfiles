@@ -8,15 +8,12 @@ if [ -f "$ANTIDOTE" ]; then
     antidote bundle zsh-users/zsh-autosuggestions
     antidote bundle zsh-users/zsh-completions
 
-    antidote bundle mattmc3/zephyr
-    antidote bundle mattmc3/zephyr path:plugins/autosuggestions
-    antidote bundle mattmc3/zephyr path:plugins/syntax-highlighting
+    autoload -Uz compinit
+    compinit
 
     antidote bundle ohmyzsh/ohmyzsh path:lib
     antidote bundle ohmyzsh/ohmyzsh path:plugins/git
     antidote bundle ohmyzsh/ohmyzsh path:plugins/extract
-
-    antidote bundle mattmc3/zephyr path:plugins/completions
 
     antidote bundle ohmyzsh/ohmyzsh path:themes/robbyrussell.zsh-theme
 fi
