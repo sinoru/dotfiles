@@ -13,7 +13,9 @@ if (( $+commands[brew] )); then
     export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
 fi
 
-if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
-    unset SSH_AGENT_PID
-    export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+if (( $+commands[gpgconf] )); then
+    if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
+        unset SSH_AGENT_PID
+        export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
+    fi
 fi
