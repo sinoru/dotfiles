@@ -21,10 +21,10 @@ if (( $+commands[pyenv-virtualenv] )); then
     eval "$(pyenv virtualenv-init -)"
 fi
 
-if [ -z "$SSH_AUTH_SOCK" ] && (( $+commands[gpgconf] )) ; then
+if (( $+commands[gpgconf] )) ; then
     gpg_agent_ssh_socket="$(gpgconf --list-dir agent-ssh-socket)"
 
-    if [ ! -S "$gpg_agent_ssh_socket" ]; then
+    if [ -z "$SSH_CONNECTION" ] && [ ! -S "$gpg_agent_ssh_socket" ]; then
         (nohup gpgconf --launch gpg-agent &> /dev/null &)
     fi
 
