@@ -14,7 +14,7 @@ if (( $+commands[brew] )); then
 fi
 
 if (( $+commands[gpgconf] )); then
-    if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ]; then
+    if [ "${gnupg_SSH_AUTH_SOCK_by:-0}" -ne $$ ] && [ -z "${SSH_CONNECTION}" ]; then
         unset SSH_AGENT_PID
         export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
     fi
