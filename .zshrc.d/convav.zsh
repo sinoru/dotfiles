@@ -99,14 +99,12 @@ convav() {
         -c copy \
         -c:v libsvtav1 \
         -g $keyint \
-        -flags -cgop \
         -preset 1 \
         -crf 32 \
         -svtav1-params "
             lp=${level_of_parallelism}:\
             enable-qm=1:\
             qm-min=4:\
-            irefresh-type=1:\
             scd=1:\
             enable-overlays=1:\
             tune=0:\
