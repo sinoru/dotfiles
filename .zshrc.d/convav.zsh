@@ -39,7 +39,7 @@ convav() {
         -show_entries stream=avg_frame_rate \
         "$input")
 
-    keyint=$(($(printf "%.0f" $(echo "$frame_rate" | bc)) * 5))
+    keyint=$(($(printf "%.0f" $(echo "scale=3;$frame_rate" | bc)) * 5))
 
     audio_streams_count=$(
         ffprobe \
