@@ -60,3 +60,8 @@ Swift 코드 작성 시 [Swift API Design Guidelines](https://www.swift.org/docu
 - 불필요하게 장황하지 않게, 핵심 위주로 답변한다.
 - 코드 예시는 Swift를 기본으로 한다 (다른 언어가 명시되지 않는 한).
 - 버전 관리 툴의 커밋 메시지는 기본적으로 영어로 작성한다.
+
+## 6. 도구 사용 정책
+
+- **Bash 허용 목록**: Bash는 아래 나열된 용도로만 사용한다. 그 외 모든 작업은 전용 도구(Read, Edit, Write, Glob, Grep 등)를 사용한다.
+  - `git`
