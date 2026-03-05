@@ -1,0 +1,6 @@
+portForwards:
+- guestPortRange: [1024, 65535]
+  guestIP: "0.0.0.0"
+  guestIPMustBeZero: true
+  hostPortRange: [1024, 65535]
+  hostIP: "0.0.0.0"

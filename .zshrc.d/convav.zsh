@@ -47,7 +47,7 @@ convav() {
         -c:v libsvtav1 \
         -g $keyint \
         -preset 1 \
-        -crf 24 \
+        -crf 21 \
         -svtav1-params "
             lp=${level_of_parallelism}:\
             enable-qm=1:\
