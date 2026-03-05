@@ -63,5 +63,5 @@ Swift 코드 작성 시 [Swift API Design Guidelines](https://www.swift.org/docu
 
 ## 6. 도구 사용 정책
 
-- **Bash 허용 목록**: Bash는 아래 나열된 용도로만 사용한다. 그 외 모든 작업은 전용 도구(Read, Edit, Write, Glob, Grep 등)를 사용한다.
+- **Bash 허용 목록**: Bash는 아래 나열된 용도로만 사용한다. 그 외 모든 작업은 전용 도구(Read, Edit, Write, Glob, Grep 등)를 사용한다. 목록에 없는 명령이 필요한 경우, 먼저 사용자에게 확인을 받는다.
   - `git`
