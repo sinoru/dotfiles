@@ -1,6 +1,6 @@
 ---
-name: swift-style
-description: Swift API Design Guidelines and naming conventions. Use when writing, reviewing, or discussing Swift code — regardless of platform (Apple, server-side, embedded, etc.).
+name: swiftlang-style
+description: "Swift API Design Guidelines and naming conventions. TRIGGER when: about to write, modify, or review *.swift files. Invoke once at the start of a coding task, before writing code. DO NOT TRIGGER when: only reading/researching code without making changes."
 ---
 
 # Swift Code Style
