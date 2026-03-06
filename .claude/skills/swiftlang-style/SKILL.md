@@ -117,6 +117,30 @@ When the operation is described by a **noun**:
 
 - **Take extra care** with `Any`, `AnyObject`, and unconstrained generic parameters to avoid ambiguity. Disambiguate with descriptive labels like `append(contentsOf:)` vs `append(_:)`.
 
+## Concurrency
+
+### Isolation
+
+- **`@MainActor` for UI code and ViewModels.** `async` ≠ background — use `@concurrent` to explicitly move work off-thread.
+- **`nonisolated` runs on the caller's executor** — prefer for library APIs.
+- **Introduce `actor` only when you have non-Sendable mutable state to protect.** Keep model classes on `@MainActor` or non-Sendable.
+- **Prefer `@MainActor` annotation** over `MainActor.run`.
+- **Finish all mutations on non-Sendable objects** before sending across isolation boundaries.
+
+### Sendable
+
+- **Value types** (struct, enum) with Sendable stored data are implicitly Sendable. Actors and `@MainActor` types likewise.
+- **Classes** must be `final` with immutable stored properties. Use `@unchecked Sendable` sparingly with manual synchronization.
+- **Prefer keeping types non-Sendable** to let the compiler prevent unsafe sharing.
+
+### Structured Concurrency
+
+- **`async let`** for fixed-count parallel work; **`TaskGroup`** for dynamic count.
+- In SwiftUI, **prefer `.task` modifier** over unmanaged `Task { }`.
+- **Cancellation is cooperative** — check with `Task.checkCancellation()` or `Task.isCancelled`.
+- **`Task.detached`** breaks isolation inheritance — use sparingly.
+- **Never block the cooperative thread pool** with semaphores or synchronous waits.
+
 ## Performance
 
 Coding practices that help both the compiler and the optimizer — see [Improving build efficiency](https://developer.apple.com/documentation/xcode/improving-build-efficiency-with-good-coding-practices) and [Writing High-Performance Swift Code](https://github.com/swiftlang/swift/blob/main/docs/OptimizationTips.rst).
