@@ -1,6 +1,6 @@
 ---
 name: swiftlang-style
-description: "Swift API Design Guidelines and naming conventions. TRIGGER when: about to write, modify, or review *.swift files. Invoke once at the start of a coding task, before writing code. DO NOT TRIGGER when: only reading/researching code without making changes."
+description: "Swift code style — formatting, naming, patterns, and conventions. TRIGGER when: about to write, modify, or review *.swift files. Invoke once at the start of a coding task, before writing code. DO NOT TRIGGER when: only reading/researching code without making changes."
 ---
 
 # Swift Code Style
@@ -13,8 +13,127 @@ Follow the [Swift API Design Guidelines](https://www.swift.org/documentation/api
 - **Clarity over brevity.** Compact code is a side-effect of Swift's type system, not a goal in itself.
 - **Write documentation comments** for every declaration. If you struggle to describe the API simply, you may have designed the wrong API.
 
+## Formatting
+
+### Indentation & Line Length
+
+- **4 spaces** for indentation (no tabs).
+- **100 characters** maximum per line. Exceptions: long URLs in comments, import statements.
+
+### Braces
+
+- **K&R style** — opening `{` on the same line as the statement.
+- Closing `}` on its own line, aligned with the statement that opened the block.
+- `} else {` stays on the same line.
+
+### Spacing
+
+- Single space before `{` and after `}` when code follows on the same line.
+- Space on both sides of binary/ternary operators and `=`. No space around `.` and range operators (`..<`, `...`).
+- Space after `,`, `:`, and `//`. At least two spaces before trailing `//` comments.
+
+### General
+
+- **No parentheses** around top-level conditions: `if condition {` — not `if (condition) {`.
+- **No semicolons.**
+
+### Trailing Commas
+
+- **Required** in multi-line collection literals and multi-line parameter lists — produces cleaner diffs.
+
+### Line-Wrapping
+
+**Cardinal rules:**
+
+1. If it fits on one line, keep it on one line.
+2. Comma-delimited lists are **one direction only** — all on one line OR each on its own line. No mixing.
+3. Continuation lines in vertically-oriented comma lists are indented **+4** from the original line.
+4. Opening `{` goes on the same line as the last continuation, unless that line is already +4 indented — then `{` on its own line to avoid visual blending.
+
+**Function declarations:**
+
+```swift
+func generateStars(
+    at location: Point,
+    count: Int
+) -> String {
+```
+
+Generic constraints with `where` — break before `where`, each constraint on its own line:
+
+```swift
+func index<Elements: Collection, Element>(
+    of element: Element,
+    in collection: Elements
+) -> Elements.Index?
+where
+    Elements.Element == Element,
+    Element: Equatable
+{
+```
+
+**Function calls** — each argument on its own line, closing `)` always on its own line:
+
+```swift
+let idx = index(
+    of: element,
+    in: collection
+)
+```
+
+**Type & extension declarations** — inheritance list each on its own line, `where` clause likewise:
+
+```swift
+class MyContainer<BaseCollection>:
+    MySuperclass,
+    MyProtocol,
+    SomeFrameworkProtocol
+where
+    BaseCollection: Collection,
+    BaseCollection.Element: Equatable
+{
+    // ...
+}
+```
+
+**Control flow** — break after keyword, indent conditions +4:
+
+```swift
+if
+    let galaxy,
+    galaxy.name == "Milky Way"
+{
+    // ...
+}
+```
+
+- Multi-line `guard` places `else` on a separate line; single-line keeps it together.
+- `for-where` wraps `where` to a new line if needed:
+
+```swift
+for element in collection
+    where element.hasVeryLongPropertyName
+{
+    // ...
+}
+```
+
+**Other expressions** — continuation lines +4 from original. If too complex, split into temporary variables.
+
+## File Organization
+
+- **One primary type per file.** File name matches the type: `MyType.swift`.
+- Protocol conformance extensions in separate files: `MyType+Protocol.swift`.
+- Use **`// MARK:`** to organize members within a file.
+- **Import statements** at the top, grouped and sorted alphabetically:
+  1. Module imports
+  2. Individual declaration imports
+  3. `@testable` imports (test targets only)
+
 ## Documentation
 
+- Use **`///`** (triple-slash). Block comments `/** */` are forbidden.
+- Use `//` for inline comments within function bodies. Avoid `/* */` block comments.
 - Begin with a **single-sentence summary** (a fragment, ending with a period).
 - Add detail in subsequent paragraphs separated by blank lines.
 - Use recognized symbol commands: `- Parameter`, `- Returns`, `- Throws`, `- Complexity`, `- Note`, `- Important`, `- Warning`, `- SeeAlso`, etc.
@@ -70,6 +189,12 @@ When the operation is described by a **noun**:
 - Protocols describing **what something is** → noun: `Collection`, `StringProtocol`
 - Protocols describing **a capability** → `-able` / `-ible` / `-ing`: `Equatable`, `Hashable`, `ProgressReporting`
 
+### Case Conventions
+
+- Types and Protocols → `UpperCamelCase`
+- Everything else → `lowerCamelCase`
+- **Acronyms** follow uniform casing: `utf8Bytes`, `HTTPSConnection`, `isRepresentableAsASCII`
+
 ### Terminology
 
 - **Avoid obscure terms** when a common word conveys meaning equally well.
@@ -86,10 +211,6 @@ When the operation is described by a **noun**:
   - There is no obvious `self`: `min(x, y, z)`
   - The function is an unconstrained generic: `print(x)`
   - Domain notation uses function syntax: `sin(x)`
-- **Case conventions:**
-  - Types and Protocols → `UpperCamelCase`
-  - Everything else → `lowerCamelCase`
-  - **Acronyms** follow uniform casing: `utf8Bytes`, `HTTPSConnection`, `isRepresentableAsASCII`
 - **Methods can share a base name** when they have the same basic meaning or operate in distinct domains. Avoid overloading on return type alone.
 
 ### Parameters
@@ -116,6 +237,60 @@ When the operation is described by a **noun**:
 ### Unconstrained Polymorphism
 
 - **Take extra care** with `Any`, `AnyObject`, and unconstrained generic parameters to avoid ambiguity. Disambiguate with descriptive labels like `append(contentsOf:)` vs `append(_:)`.
+
+## Patterns
+
+### Type Inference & Shorthand
+
+- **Omit type annotations** when the type is obvious from the right-hand side. (Exception: complex expressions — see Performance > Compile Time.)
+  - ✅ `let sun = Star(mass: 1.989e30)` — ❌ `let sun: Star = Star(mass: 1.989e30)`
+- **Use shorthand type syntax**: `[Element]`, `String?`, `[Key: Value]` — not `Array<Element>`, `Optional<String>`, `Dictionary<Key, Value>`.
+- **Omit `-> Void`** in function declarations. In closure types, use `Void`: `() -> Void` — not `() -> ()`.
+- **Omit `.init`** when not required: `Universe()` — not `Universe.init()`.
+
+### Control Flow
+
+- **`guard` for early exits and preconditions.** Keeps the main logic flush-left and failure conditions coupled to their triggers.
+- **`for-where`** when the entire loop body is a single `if`: `for item in items where item.isValid {`
+- **`for` over `.forEach()`** — unless `.forEach` is the last element in a functional chain.
+
+### self
+
+- **Omit `self`** unless required for disambiguation or by the language (closures, initializers).
+- **`guard let self else { return }`** when upgrading a weak self reference.
+
+### Optionals & Safety
+
+- **Force unwrap and force cast are strongly discouraged.** If used, include a comment explaining why it is safe. Exception: tests.
+- **Avoid implicitly unwrapped optionals** — use regular `Optional` or non-optional. Exceptions: `@IBOutlet`, properties initialized in `viewDidLoad` / `setUp()`.
+- **Prefer `weak` over `unowned`** to prevent crashes from deallocated objects.
+- **`try!` is generally forbidden** — equivalent to `fatalError` without a message. Exception: tests, or compile-time-provable safety (e.g., regex from string literal).
+
+## Attributes & Access Control
+
+### Attribute Ordering
+
+Declarations follow this order: **doc comment → `@` attributes → access control + other modifiers → declaration keyword**.
+
+Each `@` attribute occupies its own line. Access control and other modifiers stay on the same line as the declaration.
+
+```swift
+/// Fetches the user profile.
+@MainActor
+@available(iOS 17.0, *)
+@discardableResult
+public final func fetchProfile() -> Profile { }
+
+@Published
+private var name: String
+```
+
+### Access Control
+
+- **Use the strictest level possible.** Prefer `public` over `open`, `private` over `fileprivate`.
+- **Omit `internal`** — it is the default.
+- **Do not put access control on extensions.** Specify it on each member individually.
+- **Mark classes and members `final`** when not designed for subclassing — enables direct dispatch instead of vtable lookups.
 
 ## Concurrency
 
@@ -151,12 +326,6 @@ Coding practices that help both the compiler and the optimizer — see [Improvin
   - ✅ `let total: Double = items.reduce(0) { $0 + $1.price }` — ❌ omitting the type annotation
 - **Simplify complex expressions.** Break long single-line closures and deeply nested conditionals into multi-line statements to prevent compiler timeouts.
 - **Define delegates with explicit protocols**, not `AnyObject?`. Concrete protocol types enable faster method resolution.
-
-### Access Control & Dispatch
-
-- **Use `private` / `fileprivate`** to minimize symbol visibility. This reduces compiler work (fewer exported symbols, smaller generated headers) *and* enables the optimizer to infer `final` for runtime dispatch.
-- **Mark classes and members `final`** when they are not designed for subclassing — enables direct calls instead of vtable lookups.
-- **`internal` (default) + Whole Module Optimization** — the optimizer sees the entire module and can infer `final` for internal declarations never overridden.
 
 ### Containers & COW
 
