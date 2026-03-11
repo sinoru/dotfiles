@@ -1,6 +1,6 @@
 ---
 name: apple-platform-developer
-description: "Apple platform version policy, framework conventions, and availability handling. TRIGGER when: working in a project targeting Apple platforms (.xcodeproj, .xcworkspace, or Apple framework imports like SwiftUI/UIKit/AppKit/WebKit). Invoke once at the start of a coding task, before writing code. DO NOT TRIGGER when: server-side Swift without Apple platform targets, or pure research tasks with no code changes."
+description: "Apple platform version policy, framework conventions, and availability handling. TRIGGER when: working in a project targeting Apple platforms (.xcodeproj, .xcworkspace, or Apple framework imports like SwiftUI/UIKit/AppKit/WebKit). Invoke before the first code edit, even if the conversation started as analysis or discussion. DO NOT TRIGGER when: server-side Swift without Apple platform targets, or pure research tasks with no code changes."
 ---
 
 # Apple Platform Conventions
