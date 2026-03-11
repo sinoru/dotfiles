@@ -1,6 +1,6 @@
 ---
 name: swiftlang-style
-description: "Swift code style — formatting, naming, patterns, and conventions. TRIGGER when: about to write or modify Swift code. Invoke before the first code edit, even if the conversation started as analysis or discussion. DO NOT TRIGGER when: only reading, researching, or reviewing Swift code without any planned changes."
+description: "Swift code style — formatting, naming, patterns, and conventions. TRIGGER when: planning, writing, or modifying Swift code. Invoke before the first code edit or implementation plan, even if the conversation started as analysis or discussion. DO NOT TRIGGER when: only reading, researching, or reviewing Swift code without any planned changes."
 ---
 
 # Swift Code Style
