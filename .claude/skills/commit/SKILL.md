@@ -33,3 +33,4 @@ Commit all local changes with a descriptive message.
 - Do NOT amend existing commits unless explicitly asked
 - If changes include files that may contain secrets (`.env`, credentials, etc.), warn the user and ask for confirmation before staging them
 - If there are no changes to commit, say so and stop
+- Do NOT use `cd` or `git -C` — all git commands must start exactly with `git status`, `git diff`, `git log`, `git add`, or `git commit` as listed in allowed-tools
