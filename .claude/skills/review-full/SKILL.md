@@ -103,6 +103,8 @@ Evaluate code across five dimensions:
 
 ## Output Format
 
+All output — including section headings, labels, and the summary — must be written in the user's preferred communication language.
+
 For each issue:
 
 ### Issue: [Concise title]
