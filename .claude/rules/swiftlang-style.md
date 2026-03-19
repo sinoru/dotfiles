@@ -1,6 +1,5 @@
 ---
-paths:
-  - "**/*.swift"
+paths: "**/*.swift"
 ---
 
 # Swift Code Style

@@ -1,8 +1,5 @@
 ---
-paths:
-  - "**/*.swift"
-  - "**/*.m"
-  - "**/*.mm"
+paths: "**/*.swift,**/*.m,**/*.mm"
 ---
 
 # Apple Platform Conventions
