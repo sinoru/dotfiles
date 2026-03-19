@@ -1,7 +1,6 @@
 ---
 name: commit
-description: "Commit all local changes with a descriptive commit message. Do NOT use automatically — only when the user explicitly runs /commit."
-disable-model-invocation: true
+description: "Commit all local changes with a descriptive commit message."
 allowed-tools:
   - Bash(git status*)
   - Bash(git diff*)
