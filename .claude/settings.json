@@ -3,7 +3,6 @@
     "commit": "",
     "pr": ""
   },
-  "model": "opus[1m]",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
@@ -21,5 +20,8 @@
     }
   },
   "model": "opusplan",
-  "effortLevel": "high"
+  "effortLevel": "high",
+  "permissions": {
+    "defaultMode": "plan"
+  }
 }
