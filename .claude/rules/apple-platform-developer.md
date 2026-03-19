@@ -1,6 +1,8 @@
 ---
-name: apple-platform-developer
-description: "Apple platform version policy, framework conventions, and availability handling. TRIGGER when: planning, writing, or modifying code in a project targeting Apple platforms (.xcodeproj, .xcworkspace, or Apple framework imports like SwiftUI/UIKit/AppKit/WebKit). Invoke before the first code edit or implementation plan, even if the conversation started as analysis or discussion. DO NOT TRIGGER when: server-side Swift without Apple platform targets, or pure research tasks with no code changes."
+paths:
+  - "**/*.swift"
+  - "**/*.m"
+  - "**/*.mm"
 ---
 
 # Apple Platform Conventions
