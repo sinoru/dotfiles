@@ -60,7 +60,7 @@ line2+=" ${DIM}|${RST} ${YLW}💰 \$${cost_fmt}${RST}"
 
 # Line 3: tokens | line changes
 line3="🔤 ${RED}↑${in_tok}${RST} ${BLU}↓${out_tok}${RST}"
-line3+=" ${DIM}|${RST} ✏️  ${GRN}+${added}${RST} ${RED}-${removed}${RST}"
+line3+=" ${DIM}|${RST} ✏️ ${GRN}+${added}${RST} ${RED}-${removed}${RST}"
 
 echo -e "${line1}"
 echo -e "${line2}"
