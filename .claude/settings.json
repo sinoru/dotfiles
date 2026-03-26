@@ -3,9 +3,23 @@
     "commit": "",
     "pr": ""
   },
+  "permissions": {
+    "defaultMode": "plan"
+  },
+  "model": "opusplan",
+  "effortLevel": "high",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
+  },
+  "language": "korean",
+  "sandbox": {
+    "enabled": true,
+    "failIfUnavailable": true,
+    "autoAllowBashIfSandboxed": true,
+    "network": {
+      "allowAllUnixSockets": true
+    }
   },
   "enabledPlugins": {
     "swift-lsp@claude-plugins-official": true,
@@ -18,10 +32,5 @@
         "repo": "anthropics/claude-plugins-official"
       }
     }
-  },
-  "model": "opusplan",
-  "effortLevel": "high",
-  "permissions": {
-    "defaultMode": "plan"
   }
 }
