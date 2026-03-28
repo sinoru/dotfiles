@@ -4,22 +4,13 @@
     "pr": ""
   },
   "permissions": {
-    "defaultMode": "plan"
+    "defaultMode": "auto"
   },
-  "model": "opusplan",
+  "model": "opus[1m]",
   "effortLevel": "high",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
-  },
-  "language": "korean",
-  "sandbox": {
-    "enabled": true,
-    "failIfUnavailable": true,
-    "autoAllowBashIfSandboxed": true,
-    "network": {
-      "allowAllUnixSockets": true
-    }
   },
   "enabledPlugins": {
     "swift-lsp@claude-plugins-official": true,
@@ -31,6 +22,15 @@
         "source": "github",
         "repo": "anthropics/claude-plugins-official"
       }
+    }
+  },
+  "language": "korean",
+  "sandbox": {
+    "enabled": true,
+    "failIfUnavailable": true,
+    "autoAllowBashIfSandboxed": true,
+    "network": {
+      "allowAllUnixSockets": true
     }
   }
 }
