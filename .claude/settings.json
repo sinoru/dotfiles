@@ -29,8 +29,10 @@
     "enabled": true,
     "failIfUnavailable": true,
     "autoAllowBashIfSandboxed": true,
-    "network": {
-      "allowAllUnixSockets": true
-    }
+    "excludedCommands": [
+      "git",
+      "xctrace"
+    ],
+    "enableWeakerNetworkIsolation": true
   }
 }
