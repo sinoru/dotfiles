@@ -3,6 +3,7 @@ minimumLimaVersion: 2.0.0
 base:
 - template:_images/debian-13
 
+# containerd is managed by Docker, not by Lima, so the values are set to false here.
 containerd:
   system: false
   user: false
