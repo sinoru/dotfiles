@@ -8,7 +8,7 @@ hlsdump() {
     local output="${2:-output_$(date +%Y%m%d_%H%M%S).ts}"
 
     local programs_json
-    programs_json=$(ffprobe -v quiet -show_entries \
+    programs_json=$(ffprobe -extension_picky 0 -v quiet -show_entries \
         program=program_id:program_tags=variant_bitrate \
         -show_entries program_stream=width,height,r_frame_rate \
         -select_streams v -of json -i "$url" 2>/dev/null)
@@ -29,7 +29,7 @@ hlsdump() {
 
     if [[ -z "$programs_list" ]]; then
         echo "No program found. Downloading with default stream."
-        ffmpeg -hide_banner -loglevel error -stats \
+        ffmpeg -extension_picky 0 -hide_banner -loglevel error -stats \
             -i "$url" -c copy "$output"
         return
     fi
@@ -45,7 +45,8 @@ hlsdump() {
     read -r best_program best_bitrate best_width best_height best_fps <<< "$(echo "$programs_list" | head -1)"
 
     echo "Selected: program $best_program (${best_width}x${best_height} @ ${best_fps}fps, $((best_bitrate / 1000)) kbps)"
-    ffmpeg -hide_banner -loglevel error -stats -i "$url" \
+    ffmpeg -extension_picky 0 -hide_banner -loglevel error -stats \
+        -i "$url" \
         -map "0:p:${best_program}" \
         -c copy \
         "$output"
