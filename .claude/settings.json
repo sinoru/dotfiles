@@ -30,8 +30,8 @@
     "failIfUnavailable": true,
     "autoAllowBashIfSandboxed": true,
     "excludedCommands": [
-      "git",
-      "xctrace"
+      "git:*",
+      "xctrace:*"
     ],
     "enableWeakerNetworkIsolation": true
   }
