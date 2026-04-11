@@ -19,34 +19,34 @@ description: >-
 
 # Apple Platform Development Guide
 
-Apple 플랫폼(iOS, macOS, watchOS, tvOS, visionOS) 프레임워크 활용 가이드.
-Swift 언어 자체(문법, 동시성, API 디자인 가이드라인)는 **swiftlang** 스킬을 참조.
-이 스킬은 플랫폼 프레임워크를 올바르게 사용하는 방법에 집중한다.
+Guide for Apple platform (iOS, macOS, watchOS, tvOS, visionOS) frameworks.
+For the Swift language itself (syntax, concurrency, API design guidelines), refer to the **swiftlang** skill.
+This skill focuses on using platform frameworks correctly.
 
 ## Core Principles
 
 ### Prefer the Latest, Avoid the Deprecated
 
-- 프로젝트의 deployment target 내에서 가장 최신 API와 패턴을 우선 사용한다.
-- Apple이 deprecated로 표시한 API는 사용하지 않는다. 대체 API가 있으면 그것을 쓴다.
-- deprecated API를 불가피하게 써야 하면 이유를 명시한다.
-- 최신 전용 API 사용 시 `if #available` / `@available`로 분기하고 fallback을 제공한다.
-- 핵심 기능이 deployment target에서 쓸 수 없는 API에 의존할 경우, 트레이드오프를 먼저 설명한다.
-- **불확실하면 sosumi 스킬로 공식 문서를 확인한다.** API 동작이나 가용성을 추측하지 않는다.
+- Always prefer the latest API and patterns available within the project's deployment target.
+- Do not use APIs that Apple has marked as deprecated. Use the replacement API instead.
+- If a deprecated API is unavoidable, document the reason explicitly.
+- When using newer-only APIs, branch with `if #available` / `@available` and provide a fallback.
+- If a core feature depends on an API unavailable at the deployment target, explain the trade-offs first.
+- **When uncertain, verify with the sosumi skill.** Do not guess API behavior or availability.
 
 ### Follow the Framework's Grain
 
-Apple 프레임워크는 각자의 설계 패턴을 갖고 있다. 외부 아키텍처 방법론(MVVM, VIPER 등)을 프레임워크 위에 덧씌우기보다, 프레임워크가 의도한 방식으로 코드를 구성한다.
+Each Apple framework has its own design patterns. Rather than layering external architecture methodologies (MVVM, VIPER, etc.) on top, structure code the way the framework intends.
 
-- **SwiftUI** — `@Observable`로 공유 상태, `@State`로 뷰 로컬 상태, `@Environment`로 의존성 주입. 프레임워크의 데이터 흐름이 곧 아키텍처. 별도 "ViewModel" 레이어가 반드시 필요한 건 아니다.
-- **UIKit** — Delegate, DataSource, Composition 패턴으로 뷰 컨트롤러를 가볍게 유지. UIContentConfiguration, DiffableDataSource 등 시스템이 제공하는 최신 패턴 활용.
-- **AppKit** — NSDocument, NSWindowController, delegate/target-action 등 Cocoa 패턴 준수.
-- **Objective-C** — Cocoa의 delegate/target-action/notification/KVO 패턴.
+- **SwiftUI** — `@Observable` for shared state, `@State` for view-local state, `@Environment` for dependency injection. The framework's data flow is the architecture. A separate "ViewModel" layer is not always necessary.
+- **UIKit** — Keep view controllers lightweight with Delegate, DataSource, and Composition patterns. Use system-provided modern patterns like UIContentConfiguration, DiffableDataSource.
+- **AppKit** — Follow Cocoa patterns: NSDocument, NSWindowController, delegate/target-action.
+- **Objective-C** — Cocoa's delegate/target-action/notification/KVO patterns.
 
 ### Follow Apple Framework Conventions
 
-- Apple 프레임워크의 기존 패턴과 네이밍 관례를 따른다.
-- Delegate 메서드 첫 번째 파라미터는 호출자(delegate source):
+- Follow existing patterns and naming conventions of Apple frameworks.
+- First parameter of delegate methods is the caller (delegate source):
   ```swift
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath)
   ```
@@ -56,40 +56,40 @@ Apple 프레임워크는 각자의 설계 패턴을 갖고 있다. 외부 아키
 
 ### Design with HIG in Mind
 
-코드를 작성할 때 Apple Human Interface Guidelines를 고려한다:
+Consider Apple Human Interface Guidelines when writing code:
 
-- **접근성**: 최소 터치 타겟 44×44pt (visionOS 60×60pt), 색상 대비 4.5:1 (본문), Dynamic Type 지원
-- **시스템 컬러/폰트**: 하드코딩 대신 semantic 색상(`label`, `systemBackground`)과 text style(`.body`, `.headline`) 사용
-- **플랫폼 관례**: 각 플랫폼의 네비게이션/인터랙션 패턴 준수 (iOS 탭바, macOS 메뉴바, tvOS 포커스, visionOS 시선+핀치)
-- **Dark Mode**: 모든 플랫폼에서 light/dark 모드 지원. semantic 색상 사용으로 자동 대응.
-- **Liquid Glass** (iOS 26+, macOS Tahoe+): 최신 디자인 시스템. 표준 컴포넌트는 자동 적용.
+- **Accessibility**: minimum touch target 44×44pt (visionOS 60×60pt), color contrast 4.5:1 (body text), Dynamic Type support
+- **System colors/fonts**: use semantic colors (`label`, `systemBackground`) and text styles (`.body`, `.headline`) instead of hardcoded values
+- **Platform conventions**: follow each platform's navigation/interaction patterns (iOS tab bar, macOS menu bar, tvOS focus, visionOS gaze+pinch)
+- **Dark Mode**: support light/dark mode on all platforms. Automatic with semantic colors.
+- **Liquid Glass** (iOS 26+, macOS Tahoe+): latest design system. Standard components adopt it automatically.
 
-상세 기준값과 플랫폼별 디자인 원칙은 `references/hig.md` 참조.
+See `references/hig.md` for detailed metrics and per-platform design principles.
 
 ---
 
 ## Framework Selection
 
-새 UI 코드를 작성할 때 프로젝트 상황에 맞는 프레임워크를 선택한다:
+Choose the appropriate framework based on the project context when writing new UI code:
 
-| 상황 | 권장 | 이유 |
-|------|------|------|
-| 새 프로젝트, 최신 OS 타겟 | **SwiftUI** | 선언적, 멀티 플랫폼, Apple이 적극 투자 중 |
-| 기존 UIKit/AppKit 코드베이스 | **기존 프레임워크 유지** + 새 화면은 SwiftUI 검토 | 일관성 우선, 점진적 도입 |
-| SwiftUI로 어려운 고급 커스텀 UI | **UIKit/AppKit** + Representable로 통합 | SwiftUI에서 감싸서 사용 |
+| Scenario | Recommended | Reason |
+|----------|-------------|--------|
+| New project, latest OS target | **SwiftUI** | Declarative, multi-platform, actively invested by Apple |
+| Existing UIKit/AppKit codebase | **Keep existing framework** + consider SwiftUI for new screens | Consistency first, gradual adoption |
+| Advanced custom UI difficult in SwiftUI | **UIKit/AppKit** + integrate via Representable | Wrap in SwiftUI |
 
-SwiftUI ↔ UIKit/AppKit 통합 패턴:
-- `UIHostingController` / `NSHostingController` — SwiftUI를 UIKit/AppKit에 임베딩
-- `UIHostingConfiguration` (iOS 16+) — UIKit 셀에 SwiftUI 직접 사용
-- `UIViewRepresentable` / `NSViewRepresentable` — UIKit/AppKit 뷰를 SwiftUI에 임베딩
+SwiftUI ↔ UIKit/AppKit integration patterns:
+- `UIHostingController` / `NSHostingController` — embed SwiftUI in UIKit/AppKit
+- `UIHostingConfiguration` (iOS 16+) — use SwiftUI directly in UIKit cells
+- `UIViewRepresentable` / `NSViewRepresentable` — embed UIKit/AppKit views in SwiftUI
 
 ---
 
 ## Objective-C Essentials
 
-Objective-C 코드를 작성하거나 Swift와 연동할 때의 핵심 규칙.
+Essential rules for writing Objective-C code or bridging with Swift.
 
-### Nullability — 모든 공개 헤더에 적용
+### Nullability — Apply to All Public Headers
 
 ```objc
 NS_ASSUME_NONNULL_BEGIN
@@ -101,21 +101,21 @@ NS_ASSUME_NONNULL_BEGIN
 NS_ASSUME_NONNULL_END
 ```
 
-annotation이 없으면 Swift에서 `!` (implicitly unwrapped optional)로 들어오므로, 반드시 annotate한다.
+Without annotations, Swift imports as `!` (implicitly unwrapped optional) — always annotate.
 
 ### Swift Bridging Annotations
 
-| Annotation | 용도 |
+| Annotation | Purpose |
 |---|---|
-| `NS_SWIFT_NAME(name)` | Swift에서의 이름 지정 |
-| `NS_REFINED_FOR_SWIFT` | `__` 접두사로 숨기고 Swift wrapper 작성 유도 |
-| `NS_SWIFT_UNAVAILABLE("msg")` | Swift에서 완전 숨김 |
-| `NS_CLOSED_ENUM` | exhaustive switch 가능한 frozen enum |
-| `NS_TYPED_ENUM` / `NS_TYPED_EXTENSIBLE_ENUM` | 상수 그룹을 struct로 매핑 |
-| `NS_SWIFT_ASYNC_NAME("name")` | async import 시 이름 지정 |
-| `NS_SWIFT_SENDABLE` / `NS_SWIFT_NONSENDABLE` | Sendable 적합성 제어 |
+| `NS_SWIFT_NAME(name)` | Specify name in Swift |
+| `NS_REFINED_FOR_SWIFT` | Hide with `__` prefix, encourage Swift wrapper |
+| `NS_SWIFT_UNAVAILABLE("msg")` | Completely hide from Swift |
+| `NS_CLOSED_ENUM` | Frozen enum allowing exhaustive switch |
+| `NS_TYPED_ENUM` / `NS_TYPED_EXTENSIBLE_ENUM` | Map constant groups to struct |
+| `NS_SWIFT_ASYNC_NAME("name")` | Specify name for async import |
+| `NS_SWIFT_SENDABLE` / `NS_SWIFT_NONSENDABLE` | Control Sendable conformance |
 
-### ARC & Retain Cycle 방지
+### ARC & Retain Cycle Prevention
 
 ```objc
 __weak __typeof(self) weakSelf = self;
@@ -126,116 +126,116 @@ __weak __typeof(self) weakSelf = self;
 }];
 ```
 
-- Delegate는 항상 `weak`. Timer target도 `weak`.
-- Block이 self를 캡처하고 self가 block을 retain하면 cycle 발생.
+- Delegates are always `weak`. Timer targets are also `weak`.
+- A retain cycle occurs when a block captures self and self retains the block.
 
-상세한 annotation 목록, bridging 설정, 동시성 브릿징은 `references/objective-c.md` 참조.
+See `references/objective-c.md` for the full annotation list, bridging setup, and concurrency bridging.
 
 ---
 
 ## Key Deprecations to Know
 
-최근 주요 deprecated 패턴과 대체:
+Notable deprecated patterns and their replacements:
 
-| Deprecated | 대체 | 시점 |
+| Deprecated | Replacement | Since |
 |---|---|---|
 | `NavigationView` | `NavigationStack` / `NavigationSplitView` | iOS 16 |
-| `ObservableObject` + `@Published` | `@Observable` 매크로 | iOS 17 |
+| `ObservableObject` + `@Published` | `@Observable` macro | iOS 17 |
 | `@StateObject` | `@State` (with `@Observable`) | iOS 17 |
-| `@ObservedObject` | plain property 또는 `@Bindable` | iOS 17 |
+| `@ObservedObject` | plain property or `@Bindable` | iOS 17 |
 | `@EnvironmentObject` | `@Environment(Type.self)` | iOS 17 |
 | `ClockKit` complications | WidgetKit accessory families | watchOS 9 |
 | TVML / TVMLKit | SwiftUI | tvOS 18 |
 | Original StoreKit API | StoreKit 2 | iOS 18 (deprecated) |
-| `UIApplicationDelegate`-only lifecycle | `UISceneDelegate` | iOS 13 (필수: iOS 27) |
+| `UIApplicationDelegate`-only lifecycle | `UISceneDelegate` | iOS 13 (required: iOS 27) |
 
 ---
 
 ## Upstream Sources
 
-이 스킬의 reference 파일들은 아래 소스에서 파생되었다. 정보가 부족하거나 최신 여부가 불확실할 때 확인한다. reference 파일 업데이트 시에도 이 소스들을 참고한다.
+The reference files in this skill are derived from the sources below. Consult them when information is insufficient or freshness is uncertain. Also use these sources when updating reference files.
 
-- **Apple 개발자 문서**: sosumi 스킬의 `searchAppleDocumentation`으로 검색
-- **Human Interface Guidelines**: sosumi 스킬로 `/design/human-interface-guidelines/` 경로 조회
-- **WWDC 세션**: sosumi 스킬로 `/videos/play/wwdc{year}/{id}` 경로 조회
-- **서드파티 / 오픈소스 프레임워크**: sosumi `fetchExternalDocumentation` 또는 [Swift Package Index](https://swiftpackageindex.com)
+- **Apple developer docs**: search via the sosumi skill's `searchAppleDocumentation`
+- **Human Interface Guidelines**: fetch via sosumi at `/design/human-interface-guidelines/` path
+- **WWDC sessions**: fetch via sosumi at `/videos/play/wwdc{year}/{id}` path
+- **Third-party / open-source frameworks**: sosumi `fetchExternalDocumentation` or [Swift Package Index](https://swiftpackageindex.com)
 
 ---
 
 ## Detailed References
 
-아래 레퍼런스 파일에서 프레임워크/플랫폼별 상세 패턴을 확인할 수 있다.
-관련 파일만 필요할 때 읽으면 된다.
+Read the relevant reference file for detailed per-framework/per-platform patterns.
+Only read the files you need.
 
 ### Framework References
 
 **`references/foundation.md`** — Modern Foundation
 FormatStyle(.formatted()), AttributedString, #Predicate, RegexBuilder,
 URLSession async/await, NotificationCenter.notifications, Duration/Clock,
-KVO in Swift vs @Observable, Codable 고급 패턴, UserDefaults.
-**읽을 시점**: Foundation API 사용, 레거시 Formatter/NSPredicate 대체, 비동기 네트워킹 시.
+KVO in Swift vs @Observable, advanced Codable patterns, UserDefaults.
+**When to read**: using Foundation APIs, replacing legacy Formatter/NSPredicate, async networking.
 
-**`references/swiftui.md`** — SwiftUI 심화
-State 관리(@State, @Binding, @Environment, @Observable, @Bindable, @Entry), Navigation
-(NavigationStack, NavigationSplitView), SwiftData 통합(@Model, @Query, ModelContainer),
-성능 최적화, UIKit/AppKit interop. **읽을 시점**: SwiftUI 뷰 작성, 데이터 흐름 설계, SwiftData 사용 시.
+**`references/swiftui.md`** — SwiftUI Deep Dive
+State management (@State, @Binding, @Environment, @Observable, @Bindable, @Entry), Navigation
+(NavigationStack, NavigationSplitView), SwiftData integration (@Model, @Query, ModelContainer),
+performance optimization, UIKit/AppKit interop. **When to read**: writing SwiftUI views, designing data flow, using SwiftData.
 
 **`references/uikit.md`** — Modern UIKit
 CellRegistration, UIContentConfiguration, DiffableDataSource, CompositionalLayout,
-viewIsAppearing, Trait 시스템, 자동 trait 추적(iOS 18), Observable 통합(iOS 26),
-Liquid Glass. **읽을 시점**: UIKit 코드 작성/수정, UIKit↔SwiftUI 통합 시.
+viewIsAppearing, Trait system, automatic trait tracking (iOS 18), Observable integration (iOS 26),
+Liquid Glass. **When to read**: writing/modifying UIKit code, UIKit↔SwiftUI integration.
 
 **`references/appkit.md`** — macOS AppKit
-NSWindow/NSViewController, 툴바, 메뉴, NSGlassEffectView(macOS Tahoe),
-SwiftUI 브릿징(NSHostingView, sceneBridgingOptions).
-**읽을 시점**: macOS 네이티브 AppKit 코드 작성 시.
+NSWindow/NSViewController, toolbars, menus, NSGlassEffectView (macOS Tahoe),
+SwiftUI bridging (NSHostingView, sceneBridgingOptions).
+**When to read**: writing native macOS AppKit code.
 
 **`references/combine.md`** — Combine & Reactive Patterns
-Combine 현재 상태(사실상 유지보수 모드), AsyncSequence 마이그레이션, .values 브릿지,
-operator 대응표, 언제 Combine을 여전히 써야 하는지.
-**읽을 시점**: Combine 코드 작성/마이그레이션, reactive 패턴 결정 시.
+Combine current status (effectively in maintenance mode), AsyncSequence migration, .values bridge,
+operator correspondence table, when Combine is still the right choice.
+**When to read**: writing/migrating Combine code, choosing reactive patterns.
 
-**`references/objective-c.md`** — Objective-C 심화
-전체 annotation 목록, bridging 설정(헤더/모듈맵), Swift↔ObjC 양방향 패턴,
-동시성 브릿징(completion handler ↔ async), SE-0436 `@objc @implementation`.
-**읽을 시점**: ObjC 코드 작성, Swift-ObjC interop 설계 시.
+**`references/objective-c.md`** — Objective-C Deep Dive
+Full annotation list, bridging setup (headers/module maps), bidirectional Swift↔ObjC patterns,
+concurrency bridging (completion handler ↔ async), SE-0436 `@objc @implementation`.
+**When to read**: writing ObjC code, designing Swift-ObjC interop.
 
 ### Platform References
 
-**`references/platforms/ios.md`** — iOS 플랫폼
-Scene 기반 라이프사이클, iPad 멀티태스킹, WidgetKit/Live Activities/ActivityKit,
-App Intents/Apple Intelligence, StoreKit 2, 백그라운드 처리, 푸시 알림, TipKit.
-**읽을 시점**: iOS 앱 기능(위젯, Live Activity, IAP, 백그라운드 등) 구현 시.
+**`references/platforms/ios.md`** — iOS Platform
+Scene-based lifecycle, iPad multitasking, WidgetKit/Live Activities/ActivityKit,
+App Intents/Apple Intelligence, StoreKit 2, background processing, push notifications, TipKit.
+**When to read**: implementing iOS app features (widgets, Live Activity, IAP, background, etc.).
 
-**`references/platforms/macos.md`** — macOS 플랫폼
-윈도우 관리(WindowGroup, Window, UtilityWindow), MenuBarExtra, 문서 기반 앱,
-메뉴/툴바/키보드 단축키, Settings scene, 샌드박싱/공증, FocusedValues.
-**읽을 시점**: macOS 앱 기능(윈도우, 메뉴바, 배포 등) 구현 시.
+**`references/platforms/macos.md`** — macOS Platform
+Window management (WindowGroup, Window, UtilityWindow), MenuBarExtra, document-based apps,
+menus/toolbars/keyboard shortcuts, Settings scene, sandboxing/notarization, FocusedValues.
+**When to read**: implementing macOS app features (windows, menu bar, distribution, etc.).
 
 **`references/platforms/watchos.md`** — watchOS
-SwiftUI 라이프사이클, watchOS 10 네비게이션 패러다임(수직 TabView + Digital Crown),
-WidgetKit complications, WatchConnectivity, Live Activities(watchOS 11), workout/HealthKit.
-**읽을 시점**: watchOS 앱/컴플리케이션 개발 시.
+SwiftUI lifecycle, watchOS 10 navigation paradigm (vertical TabView + Digital Crown),
+WidgetKit complications, WatchConnectivity, Live Activities (watchOS 11), workout/HealthKit.
+**When to read**: developing watchOS apps/complications.
 
 **`references/platforms/tvos.md`** — tvOS
-Focus engine, 리모컨 인터랙션, Top Shelf, 컨텐츠 shelf/lockup 패턴,
-미디어 재생(AVPlayerViewController), TVML→SwiftUI 마이그레이션.
-**읽을 시점**: tvOS 앱 개발 시.
+Focus engine, remote interaction, Top Shelf, content shelf/lockup patterns,
+media playback (AVPlayerViewController), TVML→SwiftUI migration.
+**When to read**: developing tvOS apps.
 
 **`references/platforms/visionos.md`** — visionOS
 Window/Volume/ImmersiveSpace, RealityKit(RealityView, Model3D, ECS),
-공간 입력(시선+핀치), ornaments, 호버 이펙트, iOS→visionOS 포팅.
-**읽을 시점**: visionOS 앱 개발, 공간 컴퓨팅 기능 구현 시.
+spatial input (gaze+pinch), ornaments, hover effects, iOS→visionOS porting.
+**When to read**: developing visionOS apps, implementing spatial computing features.
 
 ### Cross-Cutting References
 
-**`references/cross-platform.md`** — 멀티 플랫폼 전략
-조건부 컴파일(`#if canImport` > `#if os`), 프로젝트 구조,
-플랫폼별 적응 패턴(NavigationSplitView, TabView, toolbar 배치).
-**읽을 시점**: 멀티 플랫폼 앱 설계, 플랫폼 분기 코드 작성 시.
+**`references/cross-platform.md`** — Multi-Platform Strategy
+Conditional compilation (`#if canImport` > `#if os`), project structure,
+per-platform adaptation patterns (NavigationSplitView, TabView, toolbar placement).
+**When to read**: designing multi-platform apps, writing platform-branching code.
 
 **`references/hig.md`** — Human Interface Guidelines
-디자인 원칙(Clarity, Deference, Depth), 플랫폼별 디자인 특성,
-타이포그래피/컬러 기준값, 레이아웃/간격, 접근성 수치, 네비게이션 패턴,
-Liquid Glass 디자인 시스템.
-**읽을 시점**: UI 설계 결정, 접근성 검토, 플랫폼별 디자인 차이 확인 시.
+Design principles (Clarity, Deference, Depth), per-platform design characteristics,
+typography/color metrics, layout/spacing, accessibility metrics, navigation patterns,
+Liquid Glass design system.
+**When to read**: UI design decisions, accessibility review, checking per-platform design differences.

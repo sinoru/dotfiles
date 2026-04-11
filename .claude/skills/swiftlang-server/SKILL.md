@@ -293,8 +293,8 @@ try await channel.executeThenClose { inbound, outbound in
 
 ## Upstream Sources
 
-이 스킬의 reference 파일들은 아래 소스에서 파생되었다. 정보가 부족하거나 최신 여부가 불확실할 때 확인한다. reference 파일 업데이트 시에도 이 소스들을 참고한다.
+The reference files in this skill are derived from the sources below. Consult them when information is insufficient or freshness is uncertain. Also use these sources when updating reference files.
 
 - **Vapor**: [docs.vapor.codes](https://docs.vapor.codes), [api.vapor.codes](https://api.vapor.codes)
-- **Server-side Swift 개요**: [swift.org/documentation/server](https://www.swift.org/documentation/server/)
-- **서버 생태계 패키지**: 각 패키지 저장소 README 또는 [Swift Package Index](https://swiftpackageindex.com)
+- **Server-side Swift overview**: [swift.org/documentation/server](https://www.swift.org/documentation/server/)
+- **Server ecosystem packages**: each package's repository README or [Swift Package Index](https://swiftpackageindex.com)

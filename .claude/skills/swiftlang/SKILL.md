@@ -107,14 +107,14 @@ When to read: choosing the right data structure (Collections), applying sequence
 
 ### `references/spm.md` — Swift Package Manager
 
-When to read: Package.swift 작성, 의존성 관리(버전 요구사항, local/binary targets, traits), 리소스 번들링, 빌드 설정(swiftSettings/cSettings), C/ObjC 혼합 타겟, 플러그인, module aliasing, 패키지 보안(서명/TOFU), 버전별 패키징 시.
+When to read: writing Package.swift, managing dependencies (version requirements, local/binary targets, traits), resource bundling, build settings (swiftSettings/cSettings), mixed C/ObjC targets, plugins, module aliasing, package security (signing/TOFU), version-specific packaging.
 
 ## Upstream Sources
 
-이 스킬의 reference 파일들은 아래 소스에서 파생되었다. 정보가 부족하거나 최신 여부가 불확실할 때 확인한다. reference 파일 업데이트 시에도 이 소스들을 참고한다.
+The reference files in this skill are derived from the sources below. Consult them when information is insufficient or freshness is uncertain. Also use these sources when updating reference files.
 
-- **Swift 언어 변경사항**: [CHANGELOG.md](https://github.com/swiftlang/swift/blob/main/CHANGELOG.md), [Swift Evolution](https://www.swift.org/swift-evolution/)
-- **Swift 공식 문서**: [swift.org/documentation](https://www.swift.org/documentation/)
-- **Swift 블로그**: [swift.org/blog](https://www.swift.org/blog/) — 언어 변경사항, official packages, 생태계 소식 전반
-- **Apple 개발자 문서 / WWDC**: sosumi 스킬로 검색
-- **Official packages**: 각 패키지 저장소 README 또는 [Swift Package Index](https://swiftpackageindex.com)
+- **Swift language changes**: [CHANGELOG.md](https://github.com/swiftlang/swift/blob/main/CHANGELOG.md), [Swift Evolution](https://www.swift.org/swift-evolution/)
+- **Swift official docs**: [swift.org/documentation](https://www.swift.org/documentation/)
+- **Swift blog**: [swift.org/blog](https://www.swift.org/blog/) — covers language changes, official packages, and ecosystem news
+- **Apple developer docs / WWDC**: search via the sosumi skill
+- **Official packages**: each package's repository README or [Swift Package Index](https://swiftpackageindex.com)
