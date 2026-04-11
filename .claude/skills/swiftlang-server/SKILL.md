@@ -288,3 +288,13 @@ try await channel.executeThenClose { inbound, outbound in
 | swift-log | 1.11.x | Swift 5.8+ | `from: "1.6.0"` |
 | swift-metrics | 2.8.x | Swift 5.8+ | `from: "2.5.0"` |
 | swift-service-lifecycle | 2.11.x | Swift 6.0+ | `from: "2.0.0"` |
+
+---
+
+## Upstream Sources
+
+이 스킬의 reference 파일들은 아래 소스에서 파생되었다. 정보가 부족하거나 최신 여부가 불확실할 때 확인한다. reference 파일 업데이트 시에도 이 소스들을 참고한다.
+
+- **Vapor**: [docs.vapor.codes](https://docs.vapor.codes), [api.vapor.codes](https://api.vapor.codes)
+- **Server-side Swift 개요**: [swift.org/documentation/server](https://www.swift.org/documentation/server/)
+- **서버 생태계 패키지**: 각 패키지 저장소 README 또는 [Swift Package Index](https://swiftpackageindex.com)

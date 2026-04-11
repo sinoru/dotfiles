@@ -151,6 +151,17 @@ __weak __typeof(self) weakSelf = self;
 
 ---
 
+## Upstream Sources
+
+이 스킬의 reference 파일들은 아래 소스에서 파생되었다. 정보가 부족하거나 최신 여부가 불확실할 때 확인한다. reference 파일 업데이트 시에도 이 소스들을 참고한다.
+
+- **Apple 개발자 문서**: sosumi 스킬의 `searchAppleDocumentation`으로 검색
+- **Human Interface Guidelines**: sosumi 스킬로 `/design/human-interface-guidelines/` 경로 조회
+- **WWDC 세션**: sosumi 스킬로 `/videos/play/wwdc{year}/{id}` 경로 조회
+- **서드파티 / 오픈소스 프레임워크**: sosumi `fetchExternalDocumentation` 또는 [Swift Package Index](https://swiftpackageindex.com)
+
+---
+
 ## Detailed References
 
 아래 레퍼런스 파일에서 프레임워크/플랫폼별 상세 패턴을 확인할 수 있다.
