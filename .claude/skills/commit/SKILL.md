@@ -34,9 +34,10 @@ Commit all local changes with a descriptive message.
    - If it does not exist, skip this step entirely
    - If it exists, `Read` it and verify it follows Keep a Changelog format by checking for **both**: a `## [Unreleased]` section AND at least one `### Added/Changed/Deprecated/Removed/Fixed/Security` heading anywhere in the file. If either is missing, skip this step
    - `Read` the rules reference at `${CLAUDE_SKILL_DIR}/keep-a-changelog-rules.md` and follow them precisely
-   - Analyze the staged diff and determine whether the changes are notable enough to warrant a changelog entry. If the changes are purely internal (trivial refactors, CI config, dev tooling, etc.) with no user-facing impact, skip this step
-   - Use `AskUserQuestion` to ask what entries to add to the changelog. Present the suggested categories (Added/Changed/Fixed etc.) based on the diff analysis as context in the question, so the user can confirm, adjust, or provide their own description
-   - Based on the user's answer, use `Edit` to add entries under `## [Unreleased]` in the appropriate category
+   - Analyze the staged diff and determine suggested changelog categories (Added/Changed/Fixed etc.) and entries
+   - Use `AskUserQuestion` to ask what entries to add to the changelog. Present your analysis — suggested categories and entries, or an explicit note that the changes appear purely internal with no user-facing impact — so the user can confirm, adjust, skip, or provide their own description
+   - If the user indicates there is nothing to add, skip the changelog update
+   - Otherwise, use `Edit` to add entries under `## [Unreleased]` in the appropriate category based on the user's answer
    - Stage the updated `CHANGELOG.md` together with other changes
 6. Write a commit message:
    - **Format**: follow the repository's conventions observed in step 4 (prefix style, tense, scope notation, etc.)
