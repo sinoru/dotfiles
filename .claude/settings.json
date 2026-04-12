@@ -30,7 +30,8 @@
     "failIfUnavailable": true,
     "autoAllowBashIfSandboxed": true,
     "excludedCommands": [
-      "git:*",
+      "git commit:*",
+      "swift:*",
       "xctrace:*"
     ],
     "enableWeakerNetworkIsolation": true
