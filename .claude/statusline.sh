@@ -205,7 +205,8 @@ usage_json=""
 
 pct_color=$(_util_color "$pct" 70 90)
 
-line1="${CYN}📂 ${dir}${RST}"
+display_dir="${dir/#$HOME/~}"
+line1="${CYN}📂 ${display_dir}${RST}"
 [[ -n "$branch" ]] && line1+=" ${DIM}|${RST} ${GRN}🌿 ${branch}${RST}"
 
 line2="🤖 ${model}"
