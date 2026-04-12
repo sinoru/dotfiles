@@ -1,14 +1,13 @@
 ---
 name: swiftlang
 description: >-
-  Comprehensive Swift language guide covering code style, API design guidelines, concurrency patterns,
-  and modern Swift 6.x features (through Swift 6.3). Use this skill whenever writing, reviewing,
-  discussing, designing, or planning Swift code — including architecture decisions, API design,
-  code reviews, concurrency patterns, performance optimization, and migration to newer Swift versions.
-  Triggers for any Swift-related development context: editing .swift files, discussing Swift approaches,
-  comparing Swift patterns, planning Swift module architecture, or answering questions about Swift
-  language features. Even if the user doesn't mention "Swift" explicitly, trigger when the context
-  clearly involves Swift development (e.g., SwiftUI views, actors, structured concurrency, Swift packages).
+  Comprehensive Swift language guide covering code style, API design guidelines,
+  concurrency patterns, and modern Swift 6.x features (through Swift 6.3).
+  TRIGGER when: editing or discussing .swift files; Package.swift present in
+  project; user mentions Swift, SwiftUI, actors, Sendable, async/await, protocols,
+  extensions, property wrappers, result builders, or any Swift language feature;
+  code context clearly involves Swift even without explicit mention. This skill
+  MUST be loaded for ANY Swift-related development context without exception.
 ---
 
 # Swift Language Guide

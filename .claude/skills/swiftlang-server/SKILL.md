@@ -1,6 +1,13 @@
 ---
 name: swiftlang-server
-description: "Server-side Swift development guide focused on Vapor, SwiftNIO, and the Swift server ecosystem. Use this skill whenever writing, modifying, debugging, or reviewing Swift server/backend/API code — including Vapor routes, controllers, middleware, Fluent ORM, SwiftNIO channel handlers, or server-side concurrency patterns. Also consult this skill when working with the Swift server ecosystem libraries (swift-log, swift-metrics, swift-service-lifecycle, AsyncHTTPClient, gRPC Swift, Swift OpenAPI Generator), deploying Swift servers via Docker, or setting up a new server-side Swift project. Even if the user doesn't explicitly say 'server' or 'Vapor', trigger this skill if the code context involves Package.swift with Vapor/SwiftNIO dependencies, EventLoop/Channel types, Fluent models, or HTTP route handlers in Swift."
+description: >-
+  Server-side Swift development guide focused on Vapor, SwiftNIO, and the Swift
+  server ecosystem.
+  TRIGGER when: code imports Vapor, SwiftNIO, or Fluent; Package.swift contains
+  vapor, fluent, or swift-nio dependencies; code uses EventLoop, Channel, Request,
+  Application, or Model types; user discusses routes, controllers, middleware,
+  migrations, or server-side Swift deployment. Always load alongside the swiftlang
+  skill when triggered.
 ---
 
 # Server-Side Swift Development Guide

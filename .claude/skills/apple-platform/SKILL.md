@@ -3,18 +3,12 @@ name: apple-platform
 description: >-
   Apple platform development guide covering SwiftUI, UIKit, AppKit, Combine,
   Objective-C, and cross-platform patterns for iOS, macOS, watchOS, tvOS, and
-  visionOS. Use this skill whenever writing, modifying, reviewing, or discussing
-  Apple platform UI/framework code — including SwiftUI views, UIKit view
-  controllers, AppKit windows, Combine pipelines, Objective-C source files (.m,
-  .mm), or Swift-ObjC bridging. Trigger when editing .swift files that import
-  Apple frameworks (SwiftUI, UIKit, AppKit, Combine, Foundation on Apple
-  platforms), .m/.mm files, .xib/.storyboard references, or when the user asks
-  about Apple HIG, WWDC best practices, or platform-specific architecture. Even
-  without explicit mention, trigger when context involves Apple platform UI, app
-  lifecycle, widgets, Live Activities, or framework integration. Also trigger for
-  watchOS complications, tvOS focus-based UI, visionOS spatial computing, or any
-  Apple platform design decisions. This skill complements the swiftlang skill
-  (Swift language itself) — use both together when working on Apple platform Swift code.
+  visionOS.
+  TRIGGER when: code imports SwiftUI, UIKit, AppKit, or Combine; editing .m/.mm
+  files or referencing .xib/.storyboard; project targets iOS/macOS/watchOS/tvOS/
+  visionOS; user discusses Apple HIG, WWDC patterns, app lifecycle, widgets, Live
+  Activities, or platform-specific architecture. Always load alongside the
+  swiftlang skill when triggered.
 ---
 
 # Apple Platform Development Guide
