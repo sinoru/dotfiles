@@ -2,7 +2,7 @@
 name: swiftlang
 description: >-
   Swift guide: code style, API design, concurrency, Swift 6.x.
-  TRIGGER when: editing .swift files; Package.swift present;
+  TRIGGER when: editing .swift files OR Package.swift present OR
   mentions Swift, actors, async/await, or Swift language features.
 ---
 

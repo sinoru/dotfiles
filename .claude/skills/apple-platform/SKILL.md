@@ -3,8 +3,8 @@ name: apple-platform
 description: >-
   Apple platform guide: SwiftUI, UIKit, AppKit, Combine, Obj-C
   for iOS/macOS/watchOS/tvOS/visionOS.
-  TRIGGER when: imports SwiftUI/UIKit/AppKit/Combine; editing
-  .m/.mm; targets Apple platforms; discusses HIG or platform
+  TRIGGER when: imports SwiftUI/UIKit/AppKit/Combine OR editing
+  .m/.mm OR targets Apple platforms OR discusses HIG or platform
   architecture. Use with swiftlang.
 ---
 
