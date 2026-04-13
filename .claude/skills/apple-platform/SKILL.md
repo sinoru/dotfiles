@@ -1,14 +1,11 @@
 ---
 name: apple-platform
 description: >-
-  Apple platform development guide covering SwiftUI, UIKit, AppKit, Combine,
-  Objective-C, and cross-platform patterns for iOS, macOS, watchOS, tvOS, and
-  visionOS.
-  TRIGGER when: code imports SwiftUI, UIKit, AppKit, or Combine; editing .m/.mm
-  files or referencing .xib/.storyboard; project targets iOS/macOS/watchOS/tvOS/
-  visionOS; user discusses Apple HIG, WWDC patterns, app lifecycle, widgets, Live
-  Activities, or platform-specific architecture. Always load alongside the
-  swiftlang skill when triggered.
+  Apple platform guide: SwiftUI, UIKit, AppKit, Combine, Obj-C
+  for iOS/macOS/watchOS/tvOS/visionOS.
+  TRIGGER when: imports SwiftUI/UIKit/AppKit/Combine; editing
+  .m/.mm; targets Apple platforms; discusses HIG or platform
+  architecture. Use with swiftlang.
 ---
 
 # Apple Platform Development Guide

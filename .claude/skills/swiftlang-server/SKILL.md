@@ -1,13 +1,11 @@
 ---
 name: swiftlang-server
 description: >-
-  Server-side Swift development guide focused on Vapor, SwiftNIO, and the Swift
-  server ecosystem.
-  TRIGGER when: code imports Vapor, SwiftNIO, or Fluent; Package.swift contains
-  vapor, fluent, or swift-nio dependencies; code uses EventLoop, Channel, Request,
-  Application, or Model types; user discusses routes, controllers, middleware,
-  migrations, or server-side Swift deployment. Always load alongside the swiftlang
-  skill when triggered.
+  Server-side Swift guide: Vapor, SwiftNIO, Fluent.
+  TRIGGER when: imports Vapor/SwiftNIO/Fluent; Package.swift
+  has vapor/swift-nio deps; uses EventLoop/Channel/Request types;
+  discusses routes, middleware, or server-side Swift.
+  Use with swiftlang.
 ---
 
 # Server-Side Swift Development Guide
