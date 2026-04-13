@@ -1,7 +1,6 @@
 ---
 name: commit
 description: "Commit all local changes with a descriptive commit message."
-context: fork
 allowed-tools:
   - Bash(git *)
   - Read
