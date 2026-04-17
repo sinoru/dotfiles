@@ -7,7 +7,6 @@
     "defaultMode": "auto"
   },
   "model": "opus[1m]",
-  "effortLevel": "high",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
@@ -29,11 +28,13 @@
     "enabled": true,
     "failIfUnavailable": true,
     "autoAllowBashIfSandboxed": true,
+    "enableWeakerNetworkIsolation": true,
     "excludedCommands": [
       "git commit:*",
       "swift:*",
       "xctrace:*"
-    ],
-    "enableWeakerNetworkIsolation": true
-  }
+    ]
+  },
+  "effortLevel": "xhigh",
+  "skipAutoPermissionPrompt": true
 }
