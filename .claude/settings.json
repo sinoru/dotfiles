@@ -36,5 +36,6 @@
     ]
   },
   "effortLevel": "xhigh",
-  "skipAutoPermissionPrompt": true
+  "skipAutoPermissionPrompt": true,
+  "autoCompactEnabled": false
 }
