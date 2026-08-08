@@ -1,5 +1,8 @@
 font-family = SF Mono
+font-family = Noto Sans Mono CJK JP
+font-family = Noto Sans Mono CJK KR
 font-size = 12
+font-thicken = false
 background = #1C1C1C
 foreground = #E0E0E0
 selection-background = #273D4C
