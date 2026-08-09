@@ -27,6 +27,6 @@ cursor-color = #7F7F7F
 cursor-style = block
 cursor-style-blink = false
 background-opacity = 0.95
-background-blur = macos-glass-regular
+background-blur = 25
 shell-integration-features = no-cursor
 bold-color = #EDEDED
