@@ -6,7 +6,6 @@
   "permissions": {
     "defaultMode": "auto"
   },
-  "model": "opus[1m]",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
@@ -14,7 +13,8 @@
   "enabledPlugins": {
     "swift-lsp@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
-    "codex@openai-codex": true
+    "codex@openai-codex": true,
+    "clangd-lsp@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
@@ -35,14 +35,30 @@
     "enabled": true,
     "failIfUnavailable": true,
     "autoAllowBashIfSandboxed": true,
+    "allowUnsandboxedCommands": true,
+    "network": {
+      "allowedDomains": [
+        "github.com"
+      ],
+      "allowAllUnixSockets": true,
+      "allowMachLookup": [
+        "com.apple.coresimulator.*"
+      ]
+    },
     "enableWeakerNetworkIsolation": true,
+    "allowAppleEvents": true,
     "excludedCommands": [
-      "git commit:*",
-      "swift:*",
-      "xctrace:*"
+      "xctrace *"
     ]
   },
-  "effortLevel": "xhigh",
+  "effortLevel": "high",
+  "promptSuggestionEnabled": false,
+  "tui": "fullscreen",
+  "theme": "auto",
+  "autoCompactEnabled": false,
+  "switchModelsOnFlag": false,
+  "remoteControlAtStartup": false,
+  "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
-  "autoCompactEnabled": false
+  "useAutoModeDuringPlan": false
 }
