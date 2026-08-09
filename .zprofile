@@ -27,3 +27,7 @@ if (( $+commands[gpgconf] )); then
         export SSH_AUTH_SOCK="$(gpgconf --list-dirs agent-ssh-socket)"
     fi
 fi
+
+if [ -x ~/.swiftly/env.sh  ]; then
+    eval "$(~/.swiftly/env.sh)"
+fi
