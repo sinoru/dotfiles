@@ -1,6 +1,6 @@
 # Swift Package Manager
 
-SwiftPM 공식 문서(docs.swift.org/swiftpm) 기반. 서버 프로젝트 전용 패턴(Vapor Package.swift 템플릿, 폴더 구조 등)은 **swiftlang-server** 스킬 참조.
+SwiftPM 공식 문서(docs.swift.org/swiftpm) 기반. 서버 프로젝트 전용 패턴(Vapor Package.swift 템플릿, 폴더 구조 등)은 `references/server/overview.md` 참조.
 
 ## Table of Contents
 

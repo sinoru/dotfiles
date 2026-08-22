@@ -1,14 +1,16 @@
 ---
 name: swiftlang
 description: >-
-  Swift guide: code style, API design, concurrency, Swift 6.x.
+  Swift guide: code style, API design, concurrency, Swift 6.x, SwiftPM,
+  and server-side Swift (Vapor, Fluent, SwiftNIO, SSWG ecosystem packages).
   TRIGGER when: discussing, planning, or developing with Swift OR
-  editing .swift files OR Package.swift present.
+  editing .swift files OR Package.swift present OR the project uses
+  Vapor/Fluent/SwiftNIO/AsyncHTTPClient.
 ---
 
 # Swift Language Guide
 
-Guidance for Swift development grounded in the [Swift API Design Guidelines](https://www.swift.org/documentation/api-design-guidelines/) and updated for Swift 6.3.
+Guidance for Swift development grounded in the [Swift API Design Guidelines](https://www.swift.org/documentation/api-design-guidelines/) and updated for Swift 6.3. One skill covers the language, the package ecosystem (SwiftPM, official packages), and server-side Swift (Vapor, Fluent, SwiftNIO — see `references/server/`).
 
 ## Core Principles
 
@@ -75,6 +77,15 @@ These are the most impactful modern Swift patterns. Read the version-specific re
 - **`@export(implementation)`** (6.3+) replaces `@_alwaysEmitIntoClient`
 - **Span / MutableSpan** (6.2+) for safe contiguous memory access without unsafe pointers
 
+### Server-Side Essentials
+
+Server code (Vapor, Fluent, SwiftNIO, SSWG packages) follows everything above plus a few rules that matter more on a server than anywhere else. These are only the headlines — read `references/server/overview.md` before writing or reviewing server code.
+
+- **Never block an EventLoop.** One EventLoop serves many connections, so `Thread.sleep`, synchronous file I/O, `.wait()`, and long CPU work stall every client on that loop. Offload CPU-bound work (Bcrypt, image processing) with `req.application.threadPool.runIfActive(eventLoop:)`.
+- **async/await is the default.** `EventLoopFuture` is legacy — bridge with `try await future.get()` / `promise.completeWithTask { }` only at the boundary with older APIs.
+- **Swift 6 shapes the types.** Vapor 4.118+ requires Swift 6: `Content`/`View` are `Sendable`, Fluent models are `final class … Model, Content, @unchecked Sendable` with an empty `init() {}`, and a DTO `struct` is the cleaner way to shape API responses.
+- **Prefer the async-first APIs.** `Application.make()` + `asyncShutdown()` over the deprecated synchronous `Application()`; `VaporTesting` (`withApp`, `app.testing()`) over `XCTVapor`; `NIOAsyncChannel` with `executeThenClose` for async channel I/O.
+
 ## Detailed References
 
 Read the relevant reference file when you need rules beyond this quick reference.
@@ -104,6 +115,16 @@ When to read: choosing the right data structure (Collections), applying sequence
 
 When to read: writing Package.swift, managing dependencies (version requirements, local/binary targets, traits), resource bundling, build settings (swiftSettings/cSettings), mixed C/ObjC targets, plugins, module aliasing, package security (signing/TOFU), version-specific packaging.
 
+### `references/server/` — Server-Side Swift (Vapor, Fluent, SwiftNIO, SSWG ecosystem)
+
+Server-side Swift used to be a separate skill; it lives here now so that one skill covers all Swift work. Reach for this directory when `Package.swift` depends on vapor, fluent, swift-nio, or SSWG packages, when code imports `Vapor`, `Fluent`, `NIO*`, or `AsyncHTTPClient`, or when the discussion is about server architecture (routing, middleware, ORM, deployment).
+
+- **`references/server/overview.md`** — Start here for any Vapor/NIO project: Package.swift template and folder layout, core architectural principles (never block an EventLoop, async/await over EventLoopFuture, request lifecycle, content negotiation), EventLoop ↔ async/await bridging, Vapor-specific Swift 6 migration notes, critical gotchas table, package version table.
+- **`references/server/vapor.md`** — Routing, controllers, middleware, Fluent ORM & migrations, authentication, HTTP client, WebSocket, sessions, validation, content system, environment, error handling, server configuration, testing, Docker deployment. Read when writing or modifying Vapor application code.
+- **`references/server/vapor-extras.md`** — Queues (job system), JWT, APNS, Leaf templating, Redis, custom commands, Files API, Services/DI, distributed tracing middleware. Read when integrating these Vapor add-on packages.
+- **`references/server/swiftnio.md`** — EventLoop, Channel, ChannelHandler, ChannelPipeline, Bootstrap, ByteBuffer, NIOAsyncChannel, Swift Concurrency bridging. Read when working at the NIO layer or debugging concurrency/performance issues.
+- **`references/server/ecosystem.md`** — swift-log, swift-metrics, swift-distributed-tracing, swift-service-lifecycle, AsyncHTTPClient, gRPC Swift 2, Swift OpenAPI Generator. Read when integrating observability, service lifecycle, or these libraries — CLI tools and daemons use them as much as servers do, so read it even when no web framework is involved.
+
 ## Upstream Sources
 
 The reference files in this skill are derived from the sources below. Consult them when information is insufficient or freshness is uncertain. Also use these sources when updating reference files.
@@ -112,4 +133,6 @@ The reference files in this skill are derived from the sources below. Consult th
 - **Swift official docs**: [swift.org/documentation](https://www.swift.org/documentation/)
 - **Swift blog**: [swift.org/blog](https://www.swift.org/blog/) — covers language changes, official packages, and ecosystem news
 - **Apple developer docs / WWDC**: search via the sosumi skill
-- **Official packages**: each package's repository README or [Swift Package Index](https://swiftpackageindex.com)
+- **Official & server ecosystem packages**: each package's repository README or [Swift Package Index](https://swiftpackageindex.com)
+- **Vapor**: [docs.vapor.codes](https://docs.vapor.codes), [api.vapor.codes](https://api.vapor.codes)
+- **Server-side Swift overview**: [swift.org/documentation/server](https://www.swift.org/documentation/server/)

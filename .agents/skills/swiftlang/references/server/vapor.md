@@ -778,13 +778,14 @@ try await app.testing().test(.POST, "todos", beforeRequest: { req in
 ```swift
 try await withApp(configure: configure) { app in
     if app.environment == .testing {
-        app.databases.use(.sqlite(.memory), as: .sqlite)
+        app.databases.use(.sqlite(.memory), as: .sqlite)  // discarded with the app — no revert needed
     }
     try await app.autoMigrate()
-    defer { try? await app.autoRevert() }
     // ... tests ...
 }
 ```
+
+With a persistent test database, revert after the tests. `defer { try? await app.autoRevert() }` only compiles on Swift 6.3+ (async `defer`); on 6.0–6.2 wrap the tests in `do { ... } catch { try? await app.autoRevert(); throw error }` and revert on the success path as well.
 
 ### Logging in Tests
 

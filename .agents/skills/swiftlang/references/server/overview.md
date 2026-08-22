@@ -1,24 +1,15 @@
----
-name: swiftlang-server
-description: >-
-  Server-side Swift guide: Vapor, SwiftNIO, Fluent.
-  TRIGGER when: discussing, planning, or developing server-side
-  Swift OR imports Vapor/SwiftNIO/Fluent OR Package.swift has
-  vapor/swift-nio deps. Use with swiftlang.
----
+# Server-Side Swift Guide
 
-# Server-Side Swift Development Guide
+Server-specific frameworks, architecture, and patterns for Vapor and the SwiftNIO ecosystem. Swift language fundamentals, concurrency theory (actors, Sendable, data race safety), and style rules are covered by `SKILL.md` and the language references (`references/style-guide.md`, `references/swift-6_*.md`); this file focuses on how those features apply in a server context.
 
-This skill covers server-specific frameworks, architecture, and patterns for Vapor and the SwiftNIO ecosystem. For Swift language fundamentals, concurrency theory (actors, Sendable, data race safety), and style guidelines, refer to the **swiftlang** skill. This skill focuses on how those features apply in a server context.
+## Files in This Directory
 
-## When to Read Reference Files
+This overview covers core principles, project setup, and critical rules. For detailed API patterns, read the matching file (paths are relative to the skill root):
 
-This SKILL.md covers core principles, project setup, and critical rules. For detailed API patterns, read the appropriate reference file:
-
-- **`references/vapor.md`** — Routing, controllers, middleware, Fluent ORM & migrations, authentication, HTTP client, WebSocket, sessions, validation, content system, environment, error handling, server configuration, testing, Docker deployment. Read when writing or modifying Vapor application code.
-- **`references/vapor-extras.md`** — Queues (job system), JWT, APNS, Leaf templating, Redis, custom commands, Files API, Services/DI, distributed tracing middleware. Read when integrating these Vapor add-on packages.
-- **`references/swiftnio.md`** — EventLoop, Channel, ChannelHandler, ChannelPipeline, Bootstrap, ByteBuffer, NIOAsyncChannel, Swift Concurrency bridging. Read when working at the NIO layer or debugging concurrency/performance issues.
-- **`references/ecosystem.md`** — swift-log, swift-metrics, swift-distributed-tracing, swift-service-lifecycle, AsyncHTTPClient, gRPC Swift 2, Swift OpenAPI Generator. Read when integrating observability, managing service lifecycle, or using these libraries.
+- **`references/server/vapor.md`** — Routing, controllers, middleware, Fluent ORM & migrations, authentication, HTTP client, WebSocket, sessions, validation, content system, environment, error handling, server configuration, testing, Docker deployment. Read when writing or modifying Vapor application code.
+- **`references/server/vapor-extras.md`** — Queues (job system), JWT, APNS, Leaf templating, Redis, custom commands, Files API, Services/DI, distributed tracing middleware. Read when integrating these Vapor add-on packages.
+- **`references/server/swiftnio.md`** — EventLoop, Channel, ChannelHandler, ChannelPipeline, Bootstrap, ByteBuffer, NIOAsyncChannel, Swift Concurrency bridging. Read when working at the NIO layer or debugging concurrency/performance issues.
+- **`references/server/ecosystem.md`** — swift-log, swift-metrics, swift-distributed-tracing, swift-service-lifecycle, AsyncHTTPClient, gRPC Swift 2, Swift OpenAPI Generator. Read when integrating observability, managing service lifecycle, or using these libraries (in servers, CLI tools, and daemons alike).
 
 ---
 
@@ -136,7 +127,7 @@ func index(req: Request) async throws -> [User] {
 
 ## Server-Side Concurrency Patterns
 
-For general Swift concurrency concepts (actors, Sendable, structured concurrency, data race safety), see the **swiftlang** skill. This section covers server-specific patterns.
+For general Swift concurrency concepts (actors, Sendable, structured concurrency, data race safety), see `SKILL.md` and `references/swift-6_0.md` through `references/swift-6_3.md`. This section covers server-specific patterns.
 
 ### EventLoop ↔ async/await Bridging
 
@@ -178,7 +169,7 @@ try await req.application.threadPool.runIfActive(eventLoop: req.eventLoop) {
 
 ## Swift 6 Migration Notes
 
-Vapor 4.118.0+ requires Swift 6.0. For general Swift 6 migration guidance (data race safety, Sendable theory, breaking changes by version), see the **swiftlang** skill's `references/swift-migration.md`. Below are Vapor/NIO-specific changes.
+Vapor 4.118.0+ requires Swift 6.0. For general Swift 6 migration guidance (data race safety, Sendable theory, breaking changes by version), see `references/swift-migration.md`. Below are Vapor/NIO-specific changes.
 
 ### Sendable Requirements (Vapor-Specific)
 
@@ -293,12 +284,4 @@ try await channel.executeThenClose { inbound, outbound in
 | swift-metrics | 2.8.x | Swift 5.8+ | `from: "2.5.0"` |
 | swift-service-lifecycle | 2.11.x | Swift 6.0+ | `from: "2.0.0"` |
 
----
-
-## Upstream Sources
-
-The reference files in this skill are derived from the sources below. Consult them when information is insufficient or freshness is uncertain. Also use these sources when updating reference files.
-
-- **Vapor**: [docs.vapor.codes](https://docs.vapor.codes), [api.vapor.codes](https://api.vapor.codes)
-- **Server-side Swift overview**: [swift.org/documentation/server](https://www.swift.org/documentation/server/)
-- **Server ecosystem packages**: each package's repository README or [Swift Package Index](https://swiftpackageindex.com)
+Upstream sources for the files in this directory (Vapor docs, swift.org server documentation, package READMEs) are listed under **Upstream Sources** in `SKILL.md`.
