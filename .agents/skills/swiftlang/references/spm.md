@@ -1,6 +1,6 @@
 # Swift Package Manager
 
-SwiftPM 공식 문서(docs.swift.org/swiftpm) 기반. 서버 프로젝트 전용 패턴(Vapor Package.swift 템플릿, 폴더 구조 등)은 `references/server/overview.md` 참조.
+Based on the official SwiftPM documentation (docs.swift.org/swiftpm). For server-project-specific patterns (the Vapor Package.swift template, folder layout, etc.), see `references/server/overview.md`.
 
 ## Table of Contents
 
@@ -22,16 +22,16 @@ SwiftPM 공식 문서(docs.swift.org/swiftpm) 기반. 서버 프로젝트 전용
 
 ### Swift Tools Version
 
-첫 번째 줄에 반드시 선언. 최소 필요 컴파일러 버전이자 manifest 파싱 방식을 결정한다.
+Must be declared on the first line. It is both the minimum compiler version required and what determines how the manifest is parsed.
 
 ```swift
 // swift-tools-version:6.1
 ```
 
-- 세 자리 semver (major.minor.patch). patch 생략 시 `.0`
-- `swift package tools-version` 명령으로 조회/변경 가능
+- Three-component semver (major.minor.patch). A missing patch is treated as `.0`
+- Query or change it with `swift package tools-version`
 
-### 기본 구조
+### Basic Structure
 
 ```swift
 // swift-tools-version:6.1
@@ -60,29 +60,29 @@ let package = Package(
 )
 ```
 
-### Product 타입
+### Product Types
 
-| 타입 | 설명 |
-|------|------|
-| `.library(name:targets:)` | 다른 패키지에서 import할 수 있는 모듈 |
-| `.library(name:type:.static,targets:)` | 정적 라이브러리 (명시) |
-| `.library(name:type:.dynamic,targets:)` | 동적 라이브러리 (명시) |
-| `.executable(name:targets:)` | 실행 가능한 프로그램 |
-| `.plugin(name:targets:)` | SwiftPM 플러그인 |
+| Type | Description |
+|------|-------------|
+| `.library(name:targets:)` | A module other packages can import |
+| `.library(name:type:.static,targets:)` | Static library (explicit) |
+| `.library(name:type:.dynamic,targets:)` | Dynamic library (explicit) |
+| `.executable(name:targets:)` | An executable program |
+| `.plugin(name:targets:)` | A SwiftPM plugin |
 
-### Target 타입
+### Target Types
 
-| 타입 | 설명 |
-|------|------|
-| `.target` | 일반 라이브러리 모듈 |
-| `.executableTarget` | 실행 가능 타겟 (`@main` 진입점) |
-| `.testTarget` | 테스트 타겟 |
-| `.macro` | Swift 매크로 타겟 (swift-syntax 의존) |
-| `.binaryTarget` | 사전 컴파일된 바이너리 (XCFramework) |
-| `.plugin` | 빌드/커맨드 플러그인 |
-| `.systemLibrary` | 시스템에 설치된 C 라이브러리 래퍼 |
+| Type | Description |
+|------|-------------|
+| `.target` | Regular library module |
+| `.executableTarget` | Executable target (`@main` entry point) |
+| `.testTarget` | Test target |
+| `.macro` | Swift macro target (depends on swift-syntax) |
+| `.binaryTarget` | Precompiled binary (XCFramework) |
+| `.plugin` | Build/command plugin |
+| `.systemLibrary` | Wrapper around a C library installed on the system |
 
-### 디렉토리 규칙
+### Directory Conventions
 
 ```
 ├── Package.swift
@@ -94,61 +94,61 @@ let package = Package(
 ├── Tests/
 │   └── MyLibraryTests/     # .testTarget(name: "MyLibraryTests")
 │       └── MyLibraryTests.swift
-└── Plugins/                # .plugin 타겟 소스
+└── Plugins/                # sources for .plugin targets
 ```
 
 ### Scaffolding
 
 ```bash
-swift package init                # 라이브러리
-swift package init --type executable  # 실행파일
-swift package init --type tool        # CLI 도구 (swift-argument-parser 포함)
-swift package init --type macro       # 매크로 (swift-syntax 포함)
+swift package init                # library
+swift package init --type executable  # executable
+swift package init --type tool        # CLI tool (includes swift-argument-parser)
+swift package init --type macro       # macro (includes swift-syntax)
 ```
 
 ---
 
 ## Dependencies
 
-### 버전 요구사항
+### Version Requirements
 
 ```swift
 dependencies: [
-    // 다음 major 버전 미만까지 (가장 일반적)
+    // Up to the next major version (most common)
     .package(url: "https://github.com/org/repo.git", from: "2.0.0"),
 
-    // 정확한 버전
+    // Exact version
     .package(url: "https://github.com/org/repo.git", exact: "2.1.3"),
 
-    // 다음 minor 버전 미만까지
+    // Up to the next minor version
     .package(url: "https://github.com/org/repo.git", .upToNextMinor(from: "2.1.0")),
 
-    // 범위
+    // Range
     .package(url: "https://github.com/org/repo.git", "2.0.0"..<"3.0.0"),
 
-    // 브랜치 (개발/테스트용)
+    // Branch (development/testing)
     .package(url: "https://github.com/org/repo.git", branch: "develop"),
 
-    // 특정 커밋 (디버깅용)
+    // Specific commit (debugging)
     .package(url: "https://github.com/org/repo.git", revision: "abc123"),
 ]
 ```
 
-Git 태그는 반드시 세 자리 semver(major.minor.patch). 두 자리 태그는 무시된다.
+Git tags must be three-component semver (major.minor.patch). Two-component tags are ignored.
 
-### Target에 의존성 연결
+### Wiring Dependencies into a Target
 
 ```swift
 .target(
     name: "MyTarget",
     dependencies: [
-        // 같은 패키지 내 타겟
+        // A target in the same package
         "OtherTarget",
 
-        // 외부 패키지의 product
+        // A product from an external package
         .product(name: "Collections", package: "swift-collections"),
 
-        // 조건부 의존성
+        // Conditional dependency
         .target(name: "LinuxHelper", condition: .when(platforms: [.linux])),
     ]
 )
@@ -162,41 +162,41 @@ dependencies: [
 ]
 ```
 
-버전 제약 없이 해당 경로의 현재 상태를 사용한다.
+Uses whatever is currently at that path, with no version constraint.
 
 ### Binary Targets
 
-Apple 플랫폼 전용. XCFramework 형태의 사전 빌드 바이너리.
+Apple platforms only. A prebuilt binary distributed as an XCFramework.
 
 ```swift
 targets: [
-    // 원격 바이너리
+    // Remote binary
     .binaryTarget(
         name: "MyBinary",
         url: "https://example.com/MyBinary.xcframework.zip",
         checksum: "abc123..."
     ),
-    // 로컬 바이너리
+    // Local binary
     .binaryTarget(name: "MyBinary", path: "Frameworks/MyBinary.xcframework"),
 ]
 ```
 
 ### Traits (6.1+)
 
-패키지가 선택적 API와 의존성을 제공하는 메커니즘.
+A mechanism for a package to offer optional APIs and dependencies.
 
 ```swift
-// 기본 trait 사용 (별도 설정 불필요)
+// Use the default traits (no extra configuration needed)
 .package(url: "https://github.com/org/repo.git", from: "1.0.0")
 
-// 모든 trait 비활성화
+// Disable all traits
 .package(url: "https://github.com/org/repo.git", from: "1.0.0", traits: [])
 
-// 특정 trait 활성화
+// Enable specific traits
 .package(url: "https://github.com/org/repo.git", from: "1.0.0", traits: ["FeatureX"])
 ```
 
-활성화된 trait는 해당 패키지에 의존하는 모든 패키지의 trait 요청을 합산(union)한다.
+The enabled traits are the union of the trait requests from every package that depends on that package.
 
 ---
 
@@ -204,74 +204,74 @@ targets: [
 
 ### Package.resolved
 
-최상위 패키지의 의존성 resolution 결과를 기록하는 파일.
+Records the result of dependency resolution for the root package.
 
-**핵심 동작:**
-- **leaf 프로젝트** (앱, 최종 실행 파일): resolved 파일이 빌드 재현성을 보장. **소스 컨트롤에 포함 권장.**
-- **라이브러리 패키지**: 다른 패키지의 의존성으로 쓰일 때 resolved 파일은 **무시됨**. `.gitignore`에 추가해도 됨.
+**Key behavior:**
+- **Leaf projects** (apps, final executables): the resolved file guarantees reproducible builds. **Recommended to check into source control.**
+- **Library packages**: when used as a dependency of another package, the resolved file is **ignored**. Adding it to `.gitignore` is fine.
 
-### 명령어
+### Commands
 
 ```bash
-# 의존성 해결 (Package.resolved 있으면 해당 버전 사용)
+# Resolve dependencies (uses the versions in Package.resolved if present)
 swift package resolve
 
-# 강제로 Package.resolved의 버전 사용
+# Force the versions recorded in Package.resolved
 swift package resolve --force-resolved-versions
 
-# 최신 eligible 버전으로 업데이트 + Package.resolved 갱신
+# Update to the latest eligible versions and refresh Package.resolved
 swift package update
 
-# 특정 패키지만 업데이트
+# Update only a specific package
 swift package update swift-collections
 ```
 
-### 암시적 Resolution
+### Implicit Resolution
 
-`swift build`, `swift run`, `swift test` 실행 시 자동으로 resolve가 먼저 수행된다.
+`swift build`, `swift run`, and `swift test` automatically resolve first.
 
 ---
 
 ## Resources
 
-Swift tools version 5.3+. 소스 코드와 함께 리소스 파일을 번들링.
+Swift tools version 5.3+. Bundles resource files alongside source code.
 
-### 선언
+### Declaration
 
 ```swift
 .target(
     name: "MyLibrary",
     resources: [
-        .process("Resources/data.json"),     // 플랫폼별 최적화 적용
-        .copy("Resources/templates"),         // 디렉토리 구조 그대로 복사
+        .process("Resources/data.json"),     // platform-specific optimization applied
+        .copy("Resources/templates"),         // copied as-is, directory structure preserved
     ],
-    exclude: ["Resources/notes.md"]          // 번들에서 제외
+    exclude: ["Resources/notes.md"]          // left out of the bundle
 )
 ```
 
 ### `.process()` vs `.copy()`
 
-| 규칙 | 동작 | 사용 시점 |
-|------|------|-----------|
-| `.process()` | 플랫폼별 최적화 (이미지 압축, asset catalog 컴파일 등). 특별한 처리가 없으면 그대로 복사 | 대부분의 경우 (기본 선택) |
-| `.copy()` | 변경 없이 그대로 복사. 디렉토리면 구조 유지 | 디렉토리 구조가 중요하거나 변환을 원치 않을 때 |
+| Rule | Behavior | When to use |
+|------|----------|-------------|
+| `.process()` | Platform-specific optimization (image compression, asset catalog compilation, etc.). Copied as-is when no special processing applies | Most cases (the default choice) |
+| `.copy()` | Copied unchanged. Directories keep their structure | When the directory structure matters or you don't want any transformation |
 
-### 접근
+### Access
 
 ```swift
-// Bundle.module — 반드시 이것을 사용
+// Bundle.module — always use this
 let url = Bundle.module.url(forResource: "data", withExtension: "json")!
 let data = try Data(contentsOf: url)
 ```
 
-`Bundle.module`은 컴파일러가 자동 생성하는 `internal static` 확장이다. `Bundle.main` 사용 금지.
+`Bundle.module` is an `internal static` extension generated by the compiler. Never use `Bundle.main` for package resources.
 
-### 디렉토리 관례
+### Directory Convention
 
 ```
 Sources/MyLibrary/
 ├── MyLibrary.swift
-└── Resources/           # 리소스 파일 분리 (권장)
+└── Resources/           # keep resource files separate (recommended)
     ├── data.json
     └── Assets.xcassets
 ```
@@ -282,15 +282,15 @@ Sources/MyLibrary/
 
 ### Debug vs Release
 
-| 설정 | Debug (기본) | Release (`-c release`) |
-|------|-------------|----------------------|
-| Swift 최적화 | `-Onone` | `-O` + `-whole-module-optimization` |
-| C 최적화 | `-O0` | `-O2` |
-| 디버그 정보 | `-g` | — |
-| 테스트 지원 | `-enable-testing` | — |
-| 빌드 결과 | `.build/debug/` | `.build/release/` |
+| Setting | Debug (default) | Release (`-c release`) |
+|---------|-----------------|------------------------|
+| Swift optimization | `-Onone` | `-O` + `-whole-module-optimization` |
+| C optimization | `-O0` | `-O2` |
+| Debug info | `-g` | — |
+| Testing support | `-enable-testing` | — |
+| Build output | `.build/debug/` | `.build/release/` |
 
-### Target-level 설정
+### Target-Level Settings
 
 ```swift
 .target(
@@ -310,7 +310,7 @@ Sources/MyLibrary/
 )
 ```
 
-### 커맨드라인 플래그
+### Command-Line Flags
 
 ```bash
 swift build -Xswiftc -warnings-as-errors
@@ -318,53 +318,53 @@ swift build -Xcc -Wall
 swift build -Xlinker -rpath -Xlinker /usr/local/lib
 ```
 
-`-Xcc`, `-Xswiftc`, `-Xlinker`는 모든 타겟에 적용된다. 타겟별 제어는 manifest의 settings 사용.
+`-Xcc`, `-Xswiftc`, and `-Xlinker` apply to every target. For per-target control, use the settings in the manifest.
 
 ---
 
 ## C/C++/ObjC Targets
 
-Swift 패키지에서 C, C++, Objective-C 코드를 모듈로 호스팅 가능.
+A Swift package can host C, C++, and Objective-C code as modules.
 
-### 디렉토리 구조
+### Directory Structure
 
 ```
 Sources/MyCLib/
-├── include/           # public 헤더 (기본 경로)
+├── include/           # public headers (default path)
 │   └── MyCLib.h
 └── source.c
 ```
 
-### Module Map 자동 생성 규칙
+### Module Map Auto-Generation Rules
 
-SwiftPM이 `include/` 디렉토리 구조에 따라 자동으로 module map을 생성한다:
+SwiftPM generates a module map automatically based on the layout of `include/`:
 
-1. `include/Foo/Foo.h` — umbrella header로 사용
-2. `include/Foo.h` (하위 디렉토리 없음) — umbrella header로 사용
-3. 그 외 — `include/` 전체를 umbrella directory로 사용
+1. `include/Foo/Foo.h` — used as the umbrella header
+2. `include/Foo.h` (no subdirectory) — used as the umbrella header
+3. Otherwise — all of `include/` is used as the umbrella directory
 
-복잡한 레이아웃이면 `include/module.modulemap`을 직접 작성.
+For more complex layouts, write `include/module.modulemap` yourself.
 
-### 커스텀 헤더 경로
+### Custom Header Path
 
 ```swift
 .target(
     name: "MyCLib",
-    publicHeadersPath: "headers"  // include/ 대신 다른 경로
+    publicHeadersPath: "headers"  // a path other than include/
 )
 ```
 
-### Swift에서 사용
+### Using It from Swift
 
 ```swift
-import MyCLib  // 자동 생성된 모듈 이름으로 import
+import MyCLib  // import by the auto-generated module name
 ```
 
 ---
 
 ## Module Aliasing
 
-Swift 5.7+. 서로 다른 패키지가 같은 이름의 모듈을 제공할 때 충돌 해결.
+Swift 5.7+. Resolves conflicts when different packages provide modules with the same name.
 
 ```swift
 .target(
@@ -380,41 +380,41 @@ Swift 5.7+. 서로 다른 패키지가 같은 이름의 모듈을 제공할 때 
 )
 ```
 
-Swift 코드에서:
+In Swift code:
 ```swift
-import Utils           // swift-draw의 Utils
-import SwiftGameUtils  // swift-game의 Utils (별칭)
+import Utils           // Utils from swift-draw
+import SwiftGameUtils  // Utils from swift-game (aliased)
 ```
 
-### 제약사항
+### Limitations
 
-- **순수 Swift만** — ObjC/C/C++ 모듈 불가. `@objc(name)` 어트리뷰트 사용 불가
-- **소스 기반만** — 사전 빌드 바이너리 불가
-- **런타임 문자열 변환 불가** — `NSClassFromString()` 등에서 사용 불가
+- **Pure Swift only** — not available for ObjC/C/C++ modules, and the `@objc(name)` attribute cannot be used
+- **Source-based only** — not available for prebuilt binaries
+- **No runtime string conversion** — cannot be used with `NSClassFromString()` and the like
 
 ---
 
 ## Plugins
 
-Swift 5.6+. 빌드 과정이나 패키지 명령을 확장하는 실행 코드.
+Swift 5.6+. Executable code that extends the build process or package commands.
 
 ### Build Plugin vs Command Plugin
 
 | | Build Plugin | Command Plugin |
 |---|---|---|
-| 실행 시점 | 빌드 중 자동 | `swift package` CLI에서 수동 |
-| 소스 수정 | 불가 | 사용자 승인 후 가능 |
-| 빌드/테스트 호출 | 불가 | 가능 |
-| 용도 | 코드 생성, 전처리 | 포매팅, 린팅, 커스텀 작업 |
+| When it runs | Automatically during the build | Manually from the `swift package` CLI |
+| Modifies sources | No | Yes, after user approval |
+| Can invoke build/test | No | Yes |
+| Typical use | Code generation, preprocessing | Formatting, linting, custom tasks |
 
-### 샌드박싱
+### Sandboxing
 
-모든 플러그인은 별도 프로세스에서 격리 실행:
-- 네트워크 접근 불가
-- 파일시스템 쓰기 제한 (임시 디렉토리만 허용)
-- Command plugin의 소스 수정은 사용자 승인 필요
+Every plugin runs isolated in a separate process:
+- No network access
+- Restricted filesystem writes (temporary directory only)
+- Source modifications by command plugins require user approval
 
-### 플러그인 사용
+### Using a Plugin
 
 ```swift
 .target(
@@ -429,33 +429,33 @@ Swift 5.6+. 빌드 과정이나 패키지 명령을 확장하는 실행 코드.
 
 ## Version-Specific Packaging
 
-여러 Swift 버전을 지원해야 할 때, 버전별 manifest를 제공할 수 있다.
+When multiple Swift versions must be supported, you can provide per-version manifests.
 
-### 버전별 Manifest 파일
+### Version-Specific Manifest Files
 
 ```
-├── Package.swift              # 최신 (swift-tools-version:6.1)
-├── Package@swift-5.10.swift   # Swift 5.10용
-└── Package@swift-5.9.swift    # Swift 5.9용
+├── Package.swift              # latest (swift-tools-version:6.1)
+├── Package@swift-5.10.swift   # for Swift 5.10
+└── Package@swift-5.9.swift    # for Swift 5.9
 ```
 
-해석 우선순위:
+Resolution order:
 1. `Package@swift-MAJOR.MINOR.PATCH.swift`
 2. `Package@swift-MAJOR.MINOR.swift`
 3. `Package@swift-MAJOR.swift`
-4. 매치 없으면 → 가장 호환되는 tools version의 manifest 선택
+4. No match → the manifest with the most compatible tools version is chosen
 
-**모범 사례**: `Package.swift`는 최신 tools version, 버전별 파일은 이전 버전만 지정.
+**Best practice**: keep `Package.swift` on the latest tools version and add version-specific files only for older versions.
 
-### 버전별 Git 태그
+### Version-Specific Git Tags
 
 ```
-1.0.0           # 모든 Swift 버전
-1.2.0@swift-5   # Swift 5.x 전용
-1.3.0           # Swift 6.0+ (5.x에서는 보이지 않음)
+1.0.0           # all Swift versions
+1.2.0@swift-5   # Swift 5.x only
+1.3.0           # Swift 6.0+ (not visible to 5.x)
 ```
 
-최신 Swift 버전용 태그에는 버전 접미사를 붙이지 않는다. 이전 버전 지원이 필요한 경우에만 사용.
+Don't add a version suffix to tags meant for the latest Swift version. Use suffixes only when older versions need to be supported.
 
 ---
 
@@ -463,44 +463,44 @@ Swift 5.6+. 빌드 과정이나 패키지 명령을 확장하는 실행 코드.
 
 ### Trust on First Use (TOFU)
 
-패키지 버전 최초 다운로드 시 fingerprint를 기록하고, 이후 다운로드에서 대조한다.
+The fingerprint is recorded the first time a package version is downloaded and checked against on later downloads.
 
-| 출처 | Fingerprint |
-|------|-------------|
+| Source | Fingerprint |
+|--------|-------------|
 | Git repository | Git revision hash |
 | Package registry | Source archive checksum |
 
-저장 위치: `~/.swiftpm/security/fingerprints/`
+Stored under: `~/.swiftpm/security/fingerprints/`
 
-fingerprint 불일치 시 에러 발생 (변조 가능성 경고). `--resolver-fingerprint-checking warn`으로 경고 수준 변경 가능.
+A fingerprint mismatch is an error (a possible-tampering warning). `--resolver-fingerprint-checking warn` downgrades it to a warning.
 
-### 패키지 서명
+### Package Signing
 
-Registry를 통해 배포하는 패키지에 서명을 추가할 수 있다.
+Packages distributed through a registry can be signed.
 
 ```bash
 swift package-registry publish \
     --signing-identity "Developer ID" \
-    # 또는
+    # or
     --private-key-path key.pem \
     --cert-chain-paths cert.pem
 ```
 
-서명 인증서 요구사항:
-- Extended Key Usage: Code Signing 포함
-- 키 강도: 256-bit EC (권장) 또는 2048-bit RSA
-- 유효 기간 내 + 미취소 (OCSP)
-- 신뢰 루트 체인 완성
+Signing certificate requirements:
+- Extended Key Usage includes Code Signing
+- Key strength: 256-bit EC (recommended) or 2048-bit RSA
+- Within its validity period and not revoked (OCSP)
+- Complete chain to a trusted root
 
-### 신뢰 저장소
+### Trust Store
 
-커스텀 루트 인증서: `~/.swiftpm/security/trust-root-certs/` (DER 인코딩)
+Custom root certificates: `~/.swiftpm/security/trust-root-certs/` (DER-encoded)
 
 ---
 
 ## Swift Build (6.3 Preview)
 
-기존 네이티브 빌드 시스템의 대체로 개발 중인 새 빌드 시스템.
+A new build system under development as a replacement for the existing native build system.
 
 ```bash
 swift build --build-system swiftbuild
@@ -508,22 +508,22 @@ swift test --build-system swiftbuild
 swift run --build-system swiftbuild
 ```
 
-### 주요 차이
+### Key Differences
 
-- **Stricter validation**: `--static-swift-stdlib` 미지원 플랫폼에서 에러 (기존: 무시)
-- **Universal binary 지원** (Apple 플랫폼):
+- **Stricter validation**: `--static-swift-stdlib` is an error on unsupported platforms (previously ignored)
+- **Universal binary support** (Apple platforms):
   ```bash
   swift build --build-system swiftbuild --arch arm64 --arch x86_64
   ```
-- **Apple 플랫폼 리소스**: xcodebuild과 동일한 리소스 처리 규칙 적용
-- **빌드 결과 경로 변경**: `swift build --show-bin-path`로 확인
-- **통합 Swift driver**: `--use-integrated-swift-driver` 옵션 deprecated
+- **Apple platform resources**: the same resource-processing rules as xcodebuild apply
+- **Build output path changed**: check with `swift build --show-bin-path`
+- **Integrated Swift driver**: the `--use-integrated-swift-driver` option is deprecated
 
-### 현재 상태
+### Current Status
 
-Preview 단계. 알려진 제한사항:
-- Windows: CodeView 디버그 정보 미지원
-- sanitizer(`scudo`, `fuzzer`) 미지원
-- 테스트 타겟 간 의존성 미지원
+Preview stage. Known limitations:
+- Windows: no CodeView debug info
+- Sanitizers (`scudo`, `fuzzer`) unsupported
+- Dependencies between test targets unsupported
 
-문제 발견 시 [swiftlang/swift-package-manager](https://github.com/swiftlang/swift-package-manager/issues) 이슈 등록.
+Report problems as issues at [swiftlang/swift-package-manager](https://github.com/swiftlang/swift-package-manager/issues).
