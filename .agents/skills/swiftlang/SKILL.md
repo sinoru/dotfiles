@@ -1,11 +1,21 @@
 ---
 name: swiftlang
 description: >-
-  Swift guide: code style, API design, concurrency, Swift 6.x, SwiftPM,
-  and server-side Swift (Vapor, Fluent, SwiftNIO, SSWG ecosystem packages).
-  TRIGGER when: discussing, planning, or developing with Swift OR
-  editing .swift files OR Package.swift present OR the project uses
-  Vapor/Fluent/SwiftNIO/AsyncHTTPClient.
+  Use for any task where Swift code is the artifact being produced, changed,
+  judged, or shipped. This covers: writing, reviewing, refactoring, or
+  debugging .swift files; API and naming review before tagging a release;
+  error handling, doc comments, and idiom checks; concurrency, Sendable, and
+  Swift 6 language-mode migration; Package.swift, targets, dependencies, and
+  build settings; and server-side Swift work with Vapor, Fluent, SwiftNIO,
+  AsyncHTTPClient, or SSWG packages — including how such a service is built,
+  containerized, configured, and deployed (Dockerfile, static linking, health
+  checks, env config), since those choices follow from the Swift toolchain
+  and package graph.
+
+  Skip it when nothing Swift-authored is at stake: installing or switching
+  toolchains, shell PATH setup, Xcode project settings, signing and
+  provisioning, generic CI plumbing with no Swift build involved, plain Apple
+  framework doc lookups, UI/design questions, and code in other languages.
 ---
 
 # Swift Language Guide
