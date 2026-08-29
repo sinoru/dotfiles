@@ -141,7 +141,7 @@ See `references/objective-c.md` for the full annotation list, bridging setup, an
 
 ## Key Deprecations to Know
 
-Notable deprecated patterns and their replacements:
+Notable deprecated patterns and their replacements. Full per-year deprecation lists live in `references/wwdc/<year>.md`.
 
 | Deprecated | Replacement | Since |
 |---|---|---|
@@ -153,7 +153,9 @@ Notable deprecated patterns and their replacements:
 | `ClockKit` complications | WidgetKit accessory families | watchOS 9 |
 | TVML / TVMLKit | SwiftUI | tvOS 18 |
 | Original StoreKit API | StoreKit 2 | iOS 18 (deprecated) |
-| `UIApplicationDelegate`-only lifecycle | `UISceneDelegate` | iOS 13 (required: iOS 27) |
+| `UIApplicationDelegate`-only lifecycle | `UISceneDelegate` | iOS 13 (iOS 27 SDK: won't launch without it) |
+| `FileDocument` / `ReferenceFileDocument` | `Document` / `ReadableDocument` / `WritableDocument` | iOS 27 |
+| `canOpenURL(_:)` | attempt open, handle failure | iOS 27 |
 
 ---
 
@@ -172,6 +174,18 @@ The reference files in this skill are derived from the sources below. Consult th
 
 Read the relevant reference file for detailed per-framework/per-platform patterns.
 Only read the files you need.
+
+### WWDC Year References (`references/wwdc/`)
+
+One file per WWDC year — everything new and deprecated across all platforms in that OS generation. Structured like the swiftlang skill's per-version files.
+
+- **`references/wwdc/2022.md`** — iOS 16 / macOS 13 Ventura: NavigationStack, Lock Screen widgets, Live Activities, App Intents, Swift Charts
+- **`references/wwdc/2023.md`** — iOS 17 / macOS 14 Sonoma: @Observable, SwiftData, TipKit, interactive widgets, watchOS 10 redesign, visionOS 1
+- **`references/wwdc/2024.md`** — iOS 18 / macOS 15 Sequoia: Apple Intelligence, @Entry, UITab, sidebarAdaptable, visionOS 2
+- **`references/wwdc/2025.md`** — iOS 26 / macOS 26 Tahoe: Liquid Glass, year-based versioning, Foundation Models, WebView, iPadOS windowing
+- **`references/wwdc/2026.md`** — iOS 27 / macOS 27 Golden Gate: UIScene mandate, new Document API, App Intents as the Siri surface, SwiftData observers, arm64-only Macs
+
+**When to read**: deciding what a deployment target allows, planning `if #available` branches, checking what an OS release added or deprecated, or answering "what's new in iOS N / WWDC YYYY".
 
 ### Framework References
 

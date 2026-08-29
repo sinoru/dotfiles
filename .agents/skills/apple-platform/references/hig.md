@@ -102,7 +102,7 @@ Regular, Medium, Semibold, Bold 선호. Ultralight, Thin, Light는 가독성 문
 
 ### Dynamic Type
 
-iOS, iPadOS, tvOS, visionOS, watchOS 지원 (macOS 미지원).
+iOS, iPadOS, visionOS, watchOS 지원. tvOS는 tvOS 27부터 지원 (macOS 미지원).
 모든 크기에서 레이아웃 적응 필수. 큰 크기에서 truncation 최소화. 접근성 크기에서 stacked 레이아웃 고려.
 
 ---

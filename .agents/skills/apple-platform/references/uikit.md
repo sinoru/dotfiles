@@ -1,11 +1,15 @@
 # Modern UIKit Reference
 
+버전별 신기능 연혁은 `wwdc/` 년도 파일 참조.
+
 ## Table of Contents
 1. [Collection/Table View 모던 패턴](#collectiontable-view-모던-패턴)
 2. [뷰 컨트롤러 라이프사이클](#뷰-컨트롤러-라이프사이클)
 3. [Trait 시스템](#trait-시스템)
 4. [SwiftUI 통합](#swiftui-통합)
-5. [iOS 26 / Liquid Glass](#ios-26--liquid-glass)
+5. [탭바 — UITab / UITabGroup](#탭바--uitab--uitabgroup-ios-18)
+6. [Observable 통합](#observable-통합-ios-26)
+7. [Liquid Glass](#liquid-glass-ios-26)
 
 ---
 
@@ -117,7 +121,7 @@ didEnterBackground ← willResignActive
 ```
 
 iOS 26: `UIWindow(windowScene:)` 외 모든 init deprecated.
-iOS 27: scene lifecycle 필수.
+iOS 27 SDK: scene lifecycle 미채택 앱은 **실행 자체가 실패** (구 SDK 빌드 바이너리는 계속 동작).
 
 ---
 
@@ -182,7 +186,28 @@ UIView.animate(springDuration: 0.5) {
 
 ---
 
-## iOS 26 / Liquid Glass
+## 탭바 — UITab / UITabGroup (iOS 18+)
+
+탭바 + 사이드바 결합 경험 (iPadOS 플로팅 탭바):
+
+```swift
+let tab = UITab(title: "Home", image: UIImage(systemName: "house")) { _ in
+    HomeViewController()
+}
+```
+
+드래그 앤 드롭 커스터마이제이션 지원.
+
+---
+
+## Observable 통합 (iOS 26+)
+
+`layoutSubviews`, cell configuration handler에서 `@Observable` 자동 추적 — 읽은 프로퍼티가 바뀌면 자동 무효화.
+`updateProperties()` — layout 전에 실행되는 프로퍼티 갱신 전용 라이프사이클 메서드.
+
+---
+
+## Liquid Glass (iOS 26+)
 
 ### 자동 적용
 
@@ -202,25 +227,3 @@ let glassEffect = UIGlassEffect()
 var config = UIButton.Configuration.glass()
 // 또는 .prominentGlass()
 ```
-
-### Observable 통합 (iOS 26)
-
-`layoutSubviews`, cell configuration handler에서 `@Observable` 자동 추적.
-`updateProperties()` — layout 전에 실행.
-
-### UITab / UITabGroup (iOS 18+)
-
-탭바 + 사이드바 결합 경험:
-
-```swift
-let tab = UITab(title: "Home", image: UIImage(systemName: "house")) { _ in
-    HomeViewController()
-}
-```
-
-드래그 앤 드롭 커스터마이제이션 지원.
-
-### UIUpdateLink (iOS 18+)
-
-`CADisplayLink`보다 세밀한 디스플레이 업데이트 제어.
-뷰 가시성에 따라 자동 활성화/비활성화.

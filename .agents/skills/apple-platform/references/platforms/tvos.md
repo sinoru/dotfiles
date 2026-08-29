@@ -18,6 +18,7 @@
 - **영속 저장소 없음**: `UserDefaults` ~500KB만 영속. `.cachesDirectory` 퍼지 가능. `.documentDirectory` **존재하지 않음** (크래시). 모든 데이터는 iCloud/원격 서버에 저장.
 - **단일 윈도우**: `WindowGroup`이 복수 윈도우 열지 않음
 - **공격적 suspend**: iOS보다 빠르게 앱 suspend/terminate
+- **Dynamic Type** (tvOS 27+): 시스템 전역 큰 텍스트 도입 — 커스텀 비디오 플레이어 등 텍스트 스케일 대응 필요
 
 ### TVML/TVMLKit — deprecated (tvOS 18)
 

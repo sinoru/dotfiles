@@ -26,11 +26,10 @@ didEnterBackground ← willResignActive ← didDisconnect
 - `sceneDidEnterBackground`: 데이터 저장, 카메라/공유 하드웨어 해제, 민감 정보 숨김
 - UIKit이 앱 스위처용 UI 스냅샷 캡처 — alert/임시 인터페이스 먼저 dismiss
 
-### iOS 26 변경
+### iOS 26 → 27 변경
 
-- `UIWindow(windowScene:)` 외 모든 init deprecated
-- 레거시 `UIApplicationDelegate` 콜백 deprecated
-- iOS 27에서 scene lifecycle 필수화
+- iOS 26: `UIWindow(windowScene:)` 외 모든 init deprecated, 레거시 `UIApplicationDelegate` 콜백 deprecated
+- iOS 27 SDK: scene lifecycle 미채택 앱은 실행 실패. 런치 스크린도 필수 (미포함 시 App Store 거부)
 
 ---
 
@@ -144,12 +143,14 @@ struct MyIntent: AppIntent {
 
 ### App Intent Domains (iOS 18)
 
-12개 도메인 + 100+ 미리 빌드된 스키마:
+12개 도메인의 미리 정의된 스키마 (도메인은 스키마 키패스에 포함):
 
 ```swift
-@AssistantIntent(domain: .mail, schema: .mail.compose)
+@AssistantIntent(schema: .mail.compose)
 struct ComposeMailIntent: AppIntent { ... }
 ```
+
+엔티티/열거형은 `@AssistantEntity(schema:)` / `@AssistantEnum(schema:)`.
 
 ### IndexedEntity (iOS 18)
 

@@ -1,5 +1,7 @@
 # visionOS Reference
 
+버전별 신기능 연혁(visionOS 2 = 2024, visionOS 26 = 2025, visionOS 27 = 2026)은 `../wwdc/` 년도 파일 참조.
+
 ## Table of Contents
 1. [앱 유형: Window, Volume, ImmersiveSpace](#앱-유형)
 2. [SwiftUI on visionOS](#swiftui-on-visionos)
@@ -7,9 +9,7 @@
 4. [공간 입력](#공간-입력)
 5. [iOS/iPadOS에서 포팅](#iosipados에서-포팅)
 6. [디자인 원칙](#디자인-원칙)
-7. [visionOS 2 (2024)](#visionos-2-2024)
-8. [visionOS 3 (2025)](#visionos-3-2025)
-9. [성능](#성능)
+7. [성능](#성능)
 
 ---
 
@@ -224,33 +224,6 @@ iPad 변형 선호 (iPhone도 지원). 시스템이 네이티브 간격, glass m
 - **텍스트는 평면으로**: 3D는 오브젝트용
 - **인체공학**: 가로 레이아웃, 콘텐츠를 공간에 고정 (사용자 시점에 고정하지 않음), 극단적 각도 회피
 - **접근성**: VoiceOver, Dwell Control, Switch Control 모두 지원
-
----
-
-## visionOS 2 (2024)
-
-- 리사이즈 가능 Volume + baseplate 가시성 + viewpoint 인식
-- 커스텀 Hover Effect (`CustomHoverEffect` 프로토콜)
-- Room Tracking (`RoomTrackingProvider`), Object Tracking
-- 동적 조명/그림자 (spotlight, directional, point)
-- Portal Crossing (`PortalCrossingComponent`)
-- 물리 관절 (fixed, spherical, revolute, prismatic, distance)
-- Enterprise API: 카메라, 바코드, Neural Engine (관리 entitlement)
-- TabletopKit: 공간 테이블탑 게임
-
----
-
-## visionOS 3 (2025)
-
-- 3D 레이아웃: `Alignment3D`, `SpatialContainer`, `SpatialOverlay`
-- 환경 오클루전 (가상 객체가 실제 물체에 가려짐)
-- `.manipulable` modifier — 손 제스처로 객체 이동/회전
-- Look-to-Scroll — 핸즈프리 시선 스크롤
-- `RemoteImmersiveSpace` — macOS Tahoe에서 Vision Pro로 스트리밍
-- PS VR2 Sense 컨트롤러 지원
-- 3배 빠른 hand tracking
-- Volume 내 alert/sheet/popover 표시 가능
-- 콘텐츠가 정의 경계 밖으로 확장 가능 ("peeking")
 
 ---
 

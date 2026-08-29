@@ -1,12 +1,14 @@
 # SwiftUI Reference
 
+버전별 신기능 연혁(Liquid Glass, WebView, @Animatable 등)은 `wwdc/` 년도 파일 참조.
+
 ## Table of Contents
 1. [State Management & Observation](#state-management--observation)
 2. [Navigation](#navigation)
 3. [SwiftData Integration](#swiftdata-integration)
 4. [Performance](#performance)
 5. [UIKit/AppKit Interop](#uikitappkit-interop)
-6. [iOS 26 / WWDC 2025 Additions](#ios-26--wwdc-2025-additions)
+6. [Liquid Glass](#liquid-glass-ios-26)
 
 ---
 
@@ -315,9 +317,7 @@ cell.contentConfiguration = UIHostingConfiguration {
 
 ---
 
-## iOS 26 / WWDC 2025 Additions
-
-### Liquid Glass
+## Liquid Glass (iOS 26+)
 
 ```swift
 Text("Label")
@@ -326,34 +326,4 @@ Text("Label")
     .glassEffect(.regular.tint(.blue).interactive())
 ```
 
-표준 네비게이션/툴바/탭바는 자동 적용.
-
-### WebView
-
-```swift
-@State private var page = WebPage()
-WebView(page)
-    .onAppear { page.url = URL(string: "https://example.com")! }
-```
-
-### Rich Text Editing
-
-`TextEditor`가 `AttributedString` 바인딩 지원.
-
-### @Animatable 매크로
-
-```swift
-@Animatable
-struct MyData {
-    var progress: Double
-    @AnimatableIgnored var label: String
-}
-```
-
-### 기타
-
-- `Chart3D` — 3D 차트 (visionOS 26)
-- `RemoteImmersiveSpace` — Mac에서 Vision Pro로 스트리밍 (macOS Tahoe)
-- macOS `List` 100k+ 항목: 6배 빠른 로딩, 16배 빠른 업데이트
-- SwiftUI Performance Instrument (Xcode)
-- RealityKit 엔티티가 `Observable` 프로토콜 적합
+표준 네비게이션/툴바/탭바는 자동 적용. 커스텀 요소 그룹핑은 `GlassEffectContainer`.

@@ -1,12 +1,12 @@
 # AppKit Reference
 
+버전별 신기능 연혁은 `wwdc/` 년도 파일 참조.
+
 ## Table of Contents
 1. [NSWindow & NSViewController](#nswindow--nsviewcontroller)
 2. [툴바 & 메뉴](#툴바--메뉴)
 3. [SwiftUI 브릿지](#swiftui-브릿지)
-4. [macOS Sonoma (14) 추가](#macos-sonoma-14-추가)
-5. [macOS Sequoia (15) 추가](#macos-sequoia-15-추가)
-6. [macOS Tahoe (26) / Liquid Glass](#macos-tahoe-26--liquid-glass)
+4. [Liquid Glass (macOS 26 Tahoe+)](#liquid-glass-macos-26-tahoe)
 
 ---
 
@@ -95,36 +95,7 @@ let menu = NSHostingMenu(rootView: menuView)
 
 ---
 
-## macOS Sonoma (14) 추가
-
-- Inspector API: trailing split view, Big Sur까지 back-deploy
-- NSPopover: 툴바 앵커링, full-size content
-- NSBezierPath.cgPath: CGPath 변환
-- CADisplayLink on macOS (`NSView.displayLink`)
-- NSColor system fills: `systemFill` ~ `quinarySystemFill`
-- 뷰가 기본적으로 bounds 클리핑하지 않음
-- Symbol effects: `addSymbolEffect()` (NSImageView)
-- HDR: NSImageView 네이티브 HDR 표시
-- NSColor, NSShadow: `Sendable`
-- NSImage, NSColor, NSSound: `Transferable`
-- Preview 매크로 for AppKit 뷰
-
----
-
-## macOS Sequoia (15) 추가
-
-- 텍스트 하이라이트: `textHighlight` attributed string 속성
-- 텍스트 입력 제안: `NSTextField.suggestionsDelegate`
-- 커서 API: `NSCursor.frameResize`, `.columnResize`, `.zoomIn`, `.zoomOut`
-- NSSavePanel.showsContentTypes: 파일 형식 피커
-- UtilityWindow scene (SwiftUI)
-- 윈도우 배치 API: `.defaultWindowPlacement()`, `.windowIdealPlacement()`
-- Plain window style: 경계 없는 윈도우
-- 윈도우 타일링: `cascadingReferenceFrame`
-
----
-
-## macOS Tahoe (26) / Liquid Glass
+## Liquid Glass (macOS 26 Tahoe+)
 
 ### 자동 적용
 
