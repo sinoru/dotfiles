@@ -1,11 +1,26 @@
 ---
 name: apple-platform
 description: >-
-  Apple platform guide: SwiftUI, UIKit, AppKit, Combine, Obj-C
-  for iOS/macOS/watchOS/tvOS/visionOS.
-  TRIGGER when: discussing, planning, or developing for Apple
-  platforms OR imports SwiftUI/UIKit/AppKit/Combine OR editing
-  .m/.mm files. Use with swiftlang.
+  Use whenever the subject is an app that runs on Apple hardware — iPhone,
+  iPad, Mac, Watch, Apple TV, Vision Pro. Two pulls:
+
+  (1) Make it feel right: a screen that "doesn't feel native" or "isn't a
+  real Mac app", hardcoded hex colors and fixed font sizes instead of
+  semantic colors and text styles, broken Dark Mode, tiny tap targets,
+  Dynamic Type, contrast, Human Interface Guidelines, stretching one UI
+  across Apple devices.
+
+  (2) Make it work right: writing or restructuring SwiftUI views and
+  UIKit/AppKit view controllers, state and data flow, navigation, list
+  scroll performance; moving off deprecated or maintenance-mode frameworks
+  (Combine → async/await, NavigationView → NavigationStack,
+  ObservableObject → @Observable, StoreKit 2) without breaking UI bindings;
+  Objective-C, nullability, Swift↔ObjC bridging; Foundation, SwiftData,
+  WidgetKit.
+
+  Trigger on any imported Apple UI framework or open .swift view / .m file.
+  Not for pure Swift language, server, or CLI work (swiftlang), Xcode
+  signing, CI, or App Store policy.
 ---
 
 # Apple Platform Development Guide
