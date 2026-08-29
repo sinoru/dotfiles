@@ -1,24 +1,24 @@
 # visionOS Reference
 
-버전별 신기능 연혁(visionOS 2 = 2024, visionOS 26 = 2025, visionOS 27 = 2026)은 `../wwdc/` 년도 파일 참조.
+For per-version feature history (visionOS 2 = 2024, visionOS 26 = 2025, visionOS 27 = 2026), see the `../wwdc/` year files.
 
 ## Table of Contents
-1. [앱 유형: Window, Volume, ImmersiveSpace](#앱-유형)
+1. [App Types: Window, Volume, ImmersiveSpace](#app-types)
 2. [SwiftUI on visionOS](#swiftui-on-visionos)
 3. [RealityKit](#realitykit)
-4. [공간 입력](#공간-입력)
-5. [iOS/iPadOS에서 포팅](#iosipados에서-포팅)
-6. [디자인 원칙](#디자인-원칙)
-7. [성능](#성능)
+4. [Spatial Input](#spatial-input)
+5. [Porting from iOS/iPadOS](#porting-from-iosipados)
+6. [Design Principles](#design-principles)
+7. [Performance](#performance)
 
 ---
 
-## 앱 유형
+## App Types
 
 ### Window
 
-기존 2D 콘텐츠. glass material 배경. 다른 앱과 Shared Space에서 공존.
-Model3D로 인라인 3D 콘텐츠 혼합 가능.
+Traditional 2D content. Glass material background. Coexists with other apps in the Shared Space.
+Can mix in inline 3D content with Model3D.
 
 ```swift
 WindowGroup { ContentView() }
@@ -26,7 +26,7 @@ WindowGroup { ContentView() }
 
 ### Volume (visionOS 1+)
 
-개발자가 3축 크기를 제어하는 제한된 3D 컨테이너:
+A bounded 3D container where the developer controls the size along all 3 axes:
 
 ```swift
 WindowGroup {
@@ -36,13 +36,13 @@ WindowGroup {
 .defaultSize(width: 0.6, height: 0.6, depth: 0.6, in: .meters)
 ```
 
-- Shared Space에서 다른 앱과 공존
-- visionOS 2: 리사이즈 가능 (`.windowResizability(.contentSize)`)
+- Coexists with other apps in the Shared Space
+- visionOS 2: resizable (`.windowResizability(.contentSize)`)
 - visionOS 2: `.volumeBaseplateVisibility`, `.onVolumeViewpointChange`
 
 ### ImmersiveSpace (visionOS 1+)
 
-무한 캔버스. 시스템 전체에서 하나만 열 수 있음.
+Infinite canvas. Only one can be open system-wide.
 
 ```swift
 ImmersiveSpace(id: "solarSystem") {
@@ -51,10 +51,10 @@ ImmersiveSpace(id: "solarSystem") {
 .immersionStyle(selection: $style, in: .mixed, .progressive, .full)
 ```
 
-3가지 스타일:
-- **Mixed** (기본): 현실 위에 가상 오버레이
-- **Progressive**: 포탈형, Digital Crown으로 몰입도 제어
-- **Full**: 패스스루 완전 대체
+3 styles:
+- **Mixed** (default): virtual overlay on top of reality
+- **Progressive**: portal-style, immersion controlled with the Digital Crown
+- **Full**: fully replaces passthrough
 
 ```swift
 @Environment(\.openImmersiveSpace) var openImmersiveSpace
@@ -63,62 +63,62 @@ ImmersiveSpace(id: "solarSystem") {
 Task { await openImmersiveSpace(id: "solarSystem") }
 ```
 
-**설계 원칙**: 항상 윈도우에서 시작. 몰입 경험 진입/퇴장은 명시적 컨트롤 제공.
+**Design principle**: Always start in a window. Provide explicit controls for entering/exiting the immersive experience.
 
 ---
 
 ## SwiftUI on visionOS
 
-### 자동 전이되는 것
+### What Carries Over Automatically
 
-모든 표준 SwiftUI 뷰, 레이아웃, 네비게이션, 제스처, 애니메이션, 접근성.
+All standard SwiftUI views, layout, navigation, gestures, animation, accessibility.
 
-### visionOS 전용
+### visionOS-Specific
 
 **Glass Material**:
 ```swift
 .glassBackgroundEffect()
 ```
 
-**Ornaments** (뷰 외부 부속 요소):
+**Ornaments** (accessory elements outside the view):
 ```swift
 .toolbar {
     ToolbarItem(placement: .bottomOrnament) { PlaybackControls() }
 }
-// 커스텀:
+// Custom:
 .ornament(attachmentAnchor: .scene(.bottom), contentAlignment: .center) {
     HStack { /* content */ }.glassBackgroundEffect()
 }
 ```
 
-**Hover Effect** (인터랙션 피드백에 필수):
+**Hover Effect** (required for interaction feedback):
 ```swift
 .hoverEffect()
 .contentShape(.hoverEffect, RoundedRectangle(cornerRadius: 8))
 ```
 
-**3D 패딩**:
+**3D Padding**:
 ```swift
 .padding3D(.back, 20)
 ```
 
-**기타**:
-- `.preferredSurroundingsEffect(.dark)` — 패스스루 어둡게
-- `.upperLimbVisibility(false)` — 실제 손 숨기기
+**Others**:
+- `.preferredSurroundingsEffect(.dark)` — darkens passthrough
+- `.upperLimbVisibility(false)` — hides real hands
 
-### 좌표계
+### Coordinate System
 
-SwiftUI Y축: 아래. RealityKit Y축: 위. Immersive Space 원점: 사용자 발 근처.
+SwiftUI Y axis: down. RealityKit Y axis: up. Immersive Space origin: near the user's feet.
 
-### TabView → 사이드바
+### TabView → Sidebar
 
-visionOS에서 TabView는 윈도우 왼쪽 수직 배치, 시선으로 자동 확장. 사이드바보다 선호.
+On visionOS, TabView is placed vertically on the left side of the window and expands automatically on gaze. Preferred over a sidebar.
 
 ---
 
 ## RealityKit
 
-### Model3D — 단순 3D 모델 (AsyncImage 유사)
+### Model3D — Simple 3D Models (Similar to AsyncImage)
 
 ```swift
 Model3D(named: "toy_robot") { model in
@@ -128,14 +128,14 @@ Model3D(named: "toy_robot") { model in
 }
 ```
 
-### RealityView — 복잡한 3D 씬
+### RealityView — Complex 3D Scenes
 
 ```swift
 RealityView { content in
     let entity = try await ModelEntity(named: "Earth")
     content.add(entity)
 } update: { content in
-    // SwiftUI 상태 변경 시에만 호출 (렌더 루프 아님!)
+    // Called only when SwiftUI state changes (not the render loop!)
 } attachments: {
     Attachment(id: "label") {
         Text("Earth").padding().glassBackgroundEffect()
@@ -143,17 +143,17 @@ RealityView { content in
 }
 ```
 
-- visionOS 1+, iOS 18+, macOS 15+ (크로스 플랫폼)
-- visionOS 26: 엔티티가 `Observable` 프로토콜 적합
+- visionOS 1+, iOS 18+, macOS 15+ (cross-platform)
+- visionOS 26: entities conform to the `Observable` protocol
 
 ### Entity Component System
 
-- `ModelComponent` — 3D 모델
-- `InputTargetComponent` + `CollisionComponent` — 제스처 수신에 **둘 다 필요**
-- `HoverEffectComponent` — 호버 시각 피드백
-- `SpatialAudioComponent` — 3D 위치 오디오
+- `ModelComponent` — 3D model
+- `InputTargetComponent` + `CollisionComponent` — **both required** to receive gestures
+- `HoverEffectComponent` — hover visual feedback
+- `SpatialAudioComponent` — 3D positional audio
 
-### 제스처 on 엔티티
+### Gestures on Entities
 
 ```swift
 RealityView { content in /* ... */ }
@@ -162,24 +162,24 @@ RealityView { content in /* ... */ }
 
 ### Materials
 
-- `PhysicallyBasedMaterial` — PBR, 조명 반응
-- `SimpleMaterial` — 간단한 매개변수
-- `UnlitMaterial` — 일정한 외관
-- `VideoMaterial` — 비디오 표면
+- `PhysicallyBasedMaterial` — PBR, responds to lighting
+- `SimpleMaterial` — simple parameters
+- `UnlitMaterial` — constant appearance
+- `VideoMaterial` — video surface
 - `ShaderGraphMaterial` — Reality Composer Pro / MaterialX
 
 ---
 
-## 공간 입력
+## Spatial Input
 
-### 간접 입력 (기본, 가장 편안함)
+### Indirect Input (default, most comfortable)
 
-시선(eye tracking)으로 대상 식별 + 핀치 제스처로 선택.
-앱은 정확한 시선 좌표를 받지 **않음** (프라이버시). hover effect 알림만.
+Identify the target via eye tracking, select with a pinch gesture.
+The app **does not** receive exact gaze coordinates (privacy). Only hover effect notifications.
 
-### 직접 입력
+### Direct Input
 
-가까운 콘텐츠를 직접 터치. 조작 중심 경험에 적합하지만 팔 피로 유발.
+Directly touch nearby content. Suited to manipulation-focused experiences but causes arm fatigue.
 
 ### Hand Tracking (ARKit)
 
@@ -188,61 +188,61 @@ let provider = HandTrackingProvider()
 // HandAnchor → HandSkeleton (27 joints)
 ```
 
-- 명시적 사용자 인가 필요
-- Full Space에서만 가능
-- visionOS 2: display-rate 전달, 예측 API
+- Requires explicit user authorization
+- Only available in Full Space
+- visionOS 2: display-rate delivery, prediction API
 
-### 디자인 제약
+### Design Constraints
 
-- 최소 터치 타겟: **60pt**
-- 원형/캡슐/둥근 사각형 모양 사용 (시선 타겟팅용)
-- 인터랙티브 콘텐츠를 편안한 시야각 내에 배치
-
----
-
-## iOS/iPadOS에서 포팅
-
-### 자동 적용
-
-iPad 변형 선호 (iPhone도 지원). 시스템이 네이티브 간격, glass material, hover effect 적용.
-
-### 필요한 수정
-
-- 불투명 배경 → **glass material** (`.glassBackgroundEffect()`)
-- 비트맵 에셋 → **벡터 에셋** (거리에 따른 스케일링)
-- 인터랙티브 요소에 **`.hoverEffect()`** 추가
-- 고정 색상 → **semantic/vibrancy 색상**
-- 사이드바 → **TabView** (윈도우가 화면 바운드에 고정되지 않음)
-- light/dark 모드 구분 불필요 (adaptive vibrancy 자동 처리)
+- Minimum touch target: **60pt**
+- Use circular/capsule/rounded rectangle shapes (for gaze targeting)
+- Place interactive content within a comfortable field of view
 
 ---
 
-## 디자인 원칙
+## Porting from iOS/iPadOS
 
-- **깊이**: 시각적 계층에 활용. 먼 것 = 크게, 가까운 것 = 작지만 두드러지게
-- **Grounding shadow**: `GroundingShadowComponent`로 공간 관계 표현
-- **텍스트는 평면으로**: 3D는 오브젝트용
-- **인체공학**: 가로 레이아웃, 콘텐츠를 공간에 고정 (사용자 시점에 고정하지 않음), 극단적 각도 회피
-- **접근성**: VoiceOver, Dwell Control, Switch Control 모두 지원
+### Applied Automatically
+
+iPad variant preferred (iPhone also supported). The system applies native spacing, glass material, and hover effect.
+
+### Required Changes
+
+- Opaque backgrounds → **glass material** (`.glassBackgroundEffect()`)
+- Bitmap assets → **vector assets** (scaling by distance)
+- Add **`.hoverEffect()`** to interactive elements
+- Fixed colors → **semantic/vibrancy colors**
+- Sidebar → **TabView** (windows are not bound to screen bounds)
+- No need to distinguish light/dark mode (adaptive vibrancy handles it automatically)
 
 ---
 
-## 성능
+## Design Principles
 
-### 렌더링
+- **Depth**: use it for visual hierarchy. Distant = large, close = small but prominent
+- **Grounding shadow**: express spatial relationships with `GroundingShadowComponent`
+- **Keep text flat**: 3D is for objects
+- **Ergonomics**: horizontal layout, anchor content to the space (not to the user's viewpoint), avoid extreme angles
+- **Accessibility**: support VoiceOver, Dwell Control, and Switch Control all
 
-- 선언적: 콘텐츠 기술 → 시스템이 양쪽 눈 자동 렌더
-- 목표 프레임: 90Hz
-- Foveated rendering: 시선 방향 고해상도, 주변부 저해상도 (RealityKit 자동)
+---
+
+## Performance
+
+### Rendering
+
+- Declarative: describe the content → the system automatically renders both eyes
+- Target frame rate: 90Hz
+- Foveated rendering: high resolution in the gaze direction, low resolution in the periphery (automatic in RealityKit)
 
 ### Shared Space vs Full Space
 
-- Shared Space: 다른 앱과 렌더링 자원 공유, 제한된 GPU
-- Full Space: 전용 렌더링 자원, 다른 앱 숨김
+- Shared Space: shares rendering resources with other apps, limited GPU
+- Full Space: dedicated rendering resources, hides other apps
 
-### 최적화
+### Optimization
 
-- `GroundingShadowComponent` (전체 동적 그림자보다 저렴)
+- `GroundingShadowComponent` (cheaper than full dynamic shadows)
 - Image-Based Lighting (IBL)
-- 세밀 geometry → 큰 삼각형 + opacity 텍스처 (주변부)
-- CompositorServices: 커스텀 Metal 파이프라인 필요 시에만 (대부분 RealityKit 사용)
+- Fine geometry → large triangles + opacity textures (periphery)
+- CompositorServices: only when a custom Metal pipeline is needed (most use RealityKit)

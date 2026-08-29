@@ -16,13 +16,13 @@
 
 ## Nullability Annotations
 
-| Annotation | Swift에서의 타입 |
+| Annotation | Type in Swift |
 |---|---|
-| `nonnull` (기본, `NS_ASSUME_NONNULL` 영역 내) | Non-optional (`String`) |
+| `nonnull` (default, within `NS_ASSUME_NONNULL` region) | Non-optional (`String`) |
 | `nullable` | Optional (`String?`) |
 | `null_resettable` | Implicitly unwrapped (`String!`) |
-| `_Nonnull` / `_Nullable` | 복잡한 포인터 타입용 qualifier 형태 |
-| annotation 없음 | Implicitly unwrapped (`!`) — 반드시 피한다 |
+| `_Nonnull` / `_Nullable` | Qualifier form for complex pointer types |
+| No annotation | Implicitly unwrapped (`!`) — always avoid this |
 
 ```objc
 NS_ASSUME_NONNULL_BEGIN
@@ -34,17 +34,17 @@ NS_ASSUME_NONNULL_BEGIN
 NS_ASSUME_NONNULL_END
 ```
 
-모든 공개 ObjC 헤더에 nullability annotation을 적용한다.
+Apply nullability annotations to every public ObjC header.
 
 ---
 
 ## Naming & API Refinement
 
-| Annotation | 용도 |
+| Annotation | Purpose |
 |---|---|
-| `NS_SWIFT_NAME(name)` | Swift import 이름 지정. free function → type member 변환 가능 |
-| `NS_REFINED_FOR_SWIFT` | `__` 접두사 추가, autocomplete 숨김. Swift wrapper 작성 유도 |
-| `NS_SWIFT_UNAVAILABLE("msg")` | Swift에서 완전 숨김 + 컴파일 에러 메시지 |
+| `NS_SWIFT_NAME(name)` | Specifies the Swift import name. Can convert a free function into a type member |
+| `NS_REFINED_FOR_SWIFT` | Adds a `__` prefix, hides from autocomplete. Encourages writing a Swift wrapper |
+| `NS_SWIFT_UNAVAILABLE("msg")` | Completely hides from Swift + compile error message |
 
 ```objc
 + (instancetype)colorWithGrayLevel:(CGFloat)gray
@@ -53,50 +53,50 @@ NS_ASSUME_NONNULL_END
 
 - (NSInteger)rawValueForOption:(MYOption)option
     NS_REFINED_FOR_SWIFT;
-// Swift: __rawValueForOption → extension에서 래핑
+// Swift: __rawValueForOption → wrap in an extension
 ```
 
 ---
 
 ## Enum & Constant Grouping
 
-| Annotation | Swift 매핑 |
+| Annotation | Swift Mapping |
 |---|---|
-| `NS_ENUM` | `@objc enum` (open, `default` 필요) |
+| `NS_ENUM` | `@objc enum` (open, requires `default`) |
 | `NS_CLOSED_ENUM` | `@frozen @objc enum` (exhaustive `switch`) |
 | `NS_OPTIONS` | `OptionSet` struct |
 | `NS_TYPED_ENUM` | `RawRepresentable` struct + static members |
-| `NS_TYPED_EXTENSIBLE_ENUM` | 확장 가능한 `RawRepresentable` struct |
+| `NS_TYPED_EXTENSIBLE_ENUM` | Extensible `RawRepresentable` struct |
 
 ```objc
 typedef NS_CLOSED_ENUM(NSInteger, MYDirection) {
     MYDirectionNorth, MYDirectionSouth, MYDirectionEast, MYDirectionWest
 };
-// Swift: switch에서 default 불필요
+// Swift: no default needed in switch
 
 typedef NSString *MYNotificationName NS_EXTENSIBLE_STRING_ENUM;
-// Swift extension으로 case 추가 가능
+// Cases can be added via a Swift extension
 ```
 
 ---
 
 ## Concurrency Annotations
 
-| Annotation | 용도 |
+| Annotation | Purpose |
 |---|---|
-| `NS_SWIFT_ASYNC(N)` | 파라미터 N을 completion handler로 명시 |
-| `NS_SWIFT_ASYNC(NONE)` | async import 비활성화 |
-| `NS_SWIFT_ASYNC_NAME("name")` | async 메서드 시그니처 지정 |
-| `NS_SWIFT_UI_ACTOR` | `@MainActor` 격리 |
-| `_Nullable_result` | completion 결과를 async에서 optional로 반환 |
-| `NS_SWIFT_SENDABLE` / `NS_SWIFT_NONSENDABLE` | Sendable 적합성 |
-| `NS_SWIFT_NONISOLATED` | nonisolated 표시 |
+| `NS_SWIFT_ASYNC(N)` | Specifies parameter N as the completion handler |
+| `NS_SWIFT_ASYNC(NONE)` | Disables async import |
+| `NS_SWIFT_ASYNC_NAME("name")` | Specifies the async method signature |
+| `NS_SWIFT_UI_ACTOR` | `@MainActor` isolation |
+| `_Nullable_result` | Returns the completion result as optional in async |
+| `NS_SWIFT_SENDABLE` / `NS_SWIFT_NONSENDABLE` | Sendable conformance |
+| `NS_SWIFT_NONISOLATED` | Marks as nonisolated |
 
-자동 async import 조건: void 반환 + completion handler 블록(void 반환) + 모든 경로에서 정확히 1회 호출.
+Automatic async import conditions: void return + completion handler block (void return) + called exactly once on every path.
 
 ```objc
 - (void)fetchDataWithCompletion:(void (^)(NSData * _Nullable, NSError * _Nullable))completion;
-// Swift에서 두 버전 모두 사용 가능:
+// Both versions are usable from Swift:
 //   func fetchData(completion: @escaping (Data?, Error?) -> Void)
 //   func fetchData() async throws -> Data
 ```
@@ -106,24 +106,24 @@ typedef NSString *MYNotificationName NS_EXTENSIBLE_STRING_ENUM;
 ## Bridging Configuration
 
 ### App Target: Bridging Header
-- Xcode가 `[ModuleName]-Bridging-Header.h` 자동 생성
-- 여기 나열된 ObjC 헤더가 모든 Swift 파일에서 접근 가능
+- Xcode auto-generates `[ModuleName]-Bridging-Header.h`
+- ObjC headers listed here are accessible from every Swift file
 
 ### Framework Target: Umbrella Header + Module
 - Build Settings > "Defines Module" = Yes
-- umbrella header에 공개 헤더 import
-- bridging header 사용 불가 (framework에서는)
+- Import public headers in the umbrella header
+- Bridging headers cannot be used (in frameworks)
 
 ### Swift → ObjC: Generated Header
-- Xcode가 `[ModuleName]-Swift.h` 자동 생성
-- `.m` 파일에서 `#import "ModuleName-Swift.h"`
-- `.h` 파일에서는 import 불가 (순환 의존) → `@class`, `@protocol` forward declaration 사용
+- Xcode auto-generates `[ModuleName]-Swift.h`
+- `#import "ModuleName-Swift.h"` in `.m` files
+- Cannot import in `.h` files (circular dependency) → use `@class`, `@protocol` forward declarations
 
 ---
 
 ## Swift → ObjC
 
-### 자동 브릿징
+### Automatic Bridging
 
 | Objective-C | Swift |
 |---|---|
@@ -135,10 +135,10 @@ typedef NSString *MYNotificationName NS_EXTENSIBLE_STRING_ENUM;
 | `id` | `Any` |
 | Block types | Closure types |
 
-### 이름 변환
-- `init` 제거, `With` 제거 후 소문자화
-- `instancetype` 반환 factory → convenience initializer
-- `NSError **` 마지막 파라미터 + BOOL/optional 반환 → `throws`
+### Name Conversion
+- Remove `init`, remove `With`, then lowercase
+- `instancetype`-returning factory → convenience initializer
+- `NSError **` last parameter + BOOL/optional return → `throws`
 
 ---
 
@@ -154,27 +154,27 @@ typedef NSString *MYNotificationName NS_EXTENSIBLE_STRING_ENUM;
 }
 ```
 
-- `NSObject` 상속 필수
-- 클래스에 `@objc`만으로는 멤버 노출 안 됨 — 각 멤버에도 필요
+- Requires NSObject inheritance
+- `@objc` on the class alone does not expose members — required on each member too
 
 ### @objcMembers
 
 ```swift
 @objcMembers class MyModel: NSObject {
-    var name: String = ""   // 자동 @objc
-    func save() { }         // 자동 @objc
+    var name: String = ""   // Automatically @objc
+    func save() { }         // Automatically @objc
 }
 ```
 
-### ObjC에 노출 불가
+### Not Exposable to ObjC
 
-Swift structs, 연관값 enum, generics, actors(`nonisolated`/`async` 멤버만 가능), nested types, 튜플.
+Swift structs, enums with associated values, generics, actors (only `nonisolated`/`async` members are possible), nested types, tuples.
 
 ---
 
 ## SE-0436: @objc @implementation
 
-ObjC 헤더를 수동 작성하고 Swift로 구현:
+Write the ObjC header manually and implement it in Swift:
 
 ```objc
 // MyClass.h
@@ -187,11 +187,11 @@ ObjC 헤더를 수동 작성하고 Swift로 구현:
 @objc @implementation
 extension MYFlippableVC {
     var frontView: UIView!
-    func flip() { /* Swift 구현 */ }
+    func flip() { /* Swift implementation */ }
 }
 ```
 
-결과 클래스가 순수 ObjC처럼 동작 — ObjC 서브클래싱, method swizzling 가능.
+The resulting class behaves like a pure ObjC class — ObjC subclassing and method swizzling are possible.
 
 ---
 
@@ -208,7 +208,7 @@ __weak __typeof(self) weakSelf = self;
 }];
 ```
 
-### Swift 동등
+### Swift Equivalent
 
 ```swift
 doSomething { [weak self] in
@@ -217,24 +217,24 @@ doSomething { [weak self] in
 }
 ```
 
-### 규칙
+### Rules
 
-- **Delegate**: 항상 `weak`
+- **Delegate**: always `weak`
 - **Timer target**: `weak`
-- **self를 참조하는 block을 프로퍼티에 저장**: `weak` capture
-- `@autoreleasepool` — 대량 임시 객체 생성 루프에서 필요
+- **Storing a block that references self in a property**: `weak` capture
+- `@autoreleasepool` — needed in loops that create large numbers of temporary objects
 
 ---
 
 ## Common Pitfalls
 
-1. **Nullability 누락** → Swift에서 `!` 타입, 런타임 크래시 위험
-2. **`.h`에서 `-Swift.h` import** → 순환 의존. forward declaration 사용
-3. **Lightweight generics 오해** → `NSArray`/`NSDictionary`/`NSSet`만 브릿지. 커스텀 클래스 generics는 Swift에서 무시
-4. **Completion handler 0회 또는 2회+ 호출** → async 브릿지에서 런타임 trap
-5. **`NS_NOESCAPE` 누락** → Swift에서 `@escaping` 취급, 불필요한 `self.` 필요
-6. **KVO 프로퍼티에 `dynamic` 누락** → `@objc`와 `dynamic` 둘 다 필요
-7. **ObjC에서 Swift 클래스 서브클래싱** → SE-0436 `@objc @implementation` 사용
-8. **`NS_ENUM` vs `NS_CLOSED_ENUM` 혼동** → 확장 불가 enum은 `NS_CLOSED_ENUM`으로
-9. **bare `id` 타입** → `instancetype`, `id<Protocol>`, 구체 타입 사용
-10. **informal protocol** → Swift에 브릿지 안 됨. `@protocol` 사용
+1. **Missing nullability** → `!` type in Swift, risk of runtime crash
+2. **Importing `-Swift.h` in a `.h`** → circular dependency. Use forward declaration
+3. **Misunderstanding lightweight generics** → only `NSArray`/`NSDictionary`/`NSSet` bridge. Custom class generics are ignored in Swift
+4. **Completion handler called 0 times or 2+ times** → runtime trap in the async bridge
+5. **Missing `NS_NOESCAPE`** → treated as `@escaping` in Swift, requires unnecessary `self.`
+6. **Missing `dynamic` on a KVO property** → both `@objc` and `dynamic` are required
+7. **Subclassing a Swift class from ObjC** → use SE-0436 `@objc @implementation`
+8. **Confusing `NS_ENUM` vs `NS_CLOSED_ENUM`** → use `NS_CLOSED_ENUM` for non-extensible enums
+9. **Bare `id` type** → use `instancetype`, `id<Protocol>`, or a concrete type
+10. **Informal protocol** → does not bridge to Swift. Use `@protocol`

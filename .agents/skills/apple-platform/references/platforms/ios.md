@@ -1,21 +1,21 @@
 # iOS Platform Reference
 
 ## Table of Contents
-1. [Scene 기반 라이프사이클](#scene-기반-라이프사이클)
-2. [iPad 멀티태스킹](#ipad-멀티태스킹)
+1. [Scene-Based Lifecycle](#scene-based-lifecycle)
+2. [iPad Multitasking](#ipad-multitasking)
 3. [WidgetKit](#widgetkit)
 4. [Live Activities / ActivityKit](#live-activities--activitykit)
 5. [App Intents](#app-intents)
 6. [StoreKit 2](#storekit-2)
-7. [백그라운드 처리](#백그라운드-처리)
-8. [푸시 알림](#푸시-알림)
+7. [Background Processing](#background-processing)
+8. [Push Notifications](#push-notifications)
 9. [TipKit](#tipkit)
 
 ---
 
-## Scene 기반 라이프사이클
+## Scene-Based Lifecycle
 
-### UISceneDelegate (iOS 13+, iOS 27 필수)
+### UISceneDelegate (iOS 13+, required in iOS 27)
 
 ```
 willConnectTo → willEnterForeground → didBecomeActive
@@ -23,22 +23,22 @@ willConnectTo → willEnterForeground → didBecomeActive
 didEnterBackground ← willResignActive ← didDisconnect
 ```
 
-- `sceneDidEnterBackground`: 데이터 저장, 카메라/공유 하드웨어 해제, 민감 정보 숨김
-- UIKit이 앱 스위처용 UI 스냅샷 캡처 — alert/임시 인터페이스 먼저 dismiss
+- `sceneDidEnterBackground`: Save data, release camera/shared hardware, hide sensitive information
+- UIKit captures a UI snapshot for the app switcher — dismiss alerts/temporary interfaces first
 
-### iOS 26 → 27 변경
+### iOS 26 → 27 Changes
 
-- iOS 26: `UIWindow(windowScene:)` 외 모든 init deprecated, 레거시 `UIApplicationDelegate` 콜백 deprecated
-- iOS 27 SDK: scene lifecycle 미채택 앱은 실행 실패. 런치 스크린도 필수 (미포함 시 App Store 거부)
+- iOS 26: All inits other than `UIWindow(windowScene:)` deprecated, legacy `UIApplicationDelegate` callbacks deprecated
+- iOS 27 SDK: Apps that haven't adopted the scene lifecycle fail to launch. A launch screen is also required (App Store rejects apps without one)
 
 ---
 
-## iPad 멀티태스킹
+## iPad Multitasking
 
-- `UIApplicationSupportsMultipleScenes` (Info.plist) — 멀티 윈도우 활성화
-- `UISceneSizeRestrictions` — 최소/최대 윈도우 크기
-- Stage Manager: `UIWindowScene` geometry preferences 사용
-- iPadOS 18: `UITab` / `UITabGroup` — 탭바 + 사이드바 결합
+- `UIApplicationSupportsMultipleScenes` (Info.plist) — enables multiple windows
+- `UISceneSizeRestrictions` — minimum/maximum window size
+- Stage Manager: uses `UIWindowScene` geometry preferences
+- iPadOS 18: `UITab` / `UITabGroup` — combines tab bar + sidebar
 
 ---
 
@@ -55,17 +55,17 @@ struct MyProvider: AppIntentTimelineProvider {
 }
 ```
 
-- 새 위젯은 `AppIntentTimelineProvider` 사용 (`IntentTimelineProvider`는 레거시)
-- 갱신 예산: 24시간당 40-70회. 포그라운드 앱/오디오/네비게이션 세션은 예산 면제.
+- New widgets use `AppIntentTimelineProvider` (`IntentTimelineProvider` is legacy)
+- Refresh budget: 40-70 times per 24 hours. Foreground app/audio/navigation sessions are exempt from the budget.
 
 ### Widget Families
 
-시스템: `systemSmall`, `systemMedium`, `systemLarge`, `systemExtraLarge`
-잠금화면/워치: `accessoryCircular`, `accessoryRectangular`, `accessoryInline`, `accessoryCorner`
+System: `systemSmall`, `systemMedium`, `systemLarge`, `systemExtraLarge`
+Lock screen/watch: `accessoryCircular`, `accessoryRectangular`, `accessoryInline`, `accessoryCorner`
 
 ### Interactive Widgets (iOS 17+)
 
-`Button`과 `Toggle`만 지원. `AppIntent`로 액션 실행:
+Only `Button` and `Toggle` are supported. Execute actions with `AppIntent`:
 
 ```swift
 Button(intent: LogDrinkIntent()) {
@@ -75,17 +75,17 @@ Button(intent: LogDrinkIntent()) {
 
 ### Control Center Controls (iOS 18+)
 
-`ControlWidget` — Control Center, 잠금화면, Action 버튼에 배치.
+`ControlWidget` — placed in Control Center, the lock screen, and the Action button.
 
-### Widget 푸시 알림 (iOS 26)
+### Widget Push Notifications (iOS 26)
 
-`WidgetPushHandler` 프로토콜로 푸시 기반 위젯 갱신.
+Push-based widget updates via the `WidgetPushHandler` protocol.
 
 ---
 
 ## Live Activities / ActivityKit
 
-### 데이터 모델
+### Data Model
 
 ```swift
 struct PizzaDeliveryAttributes: ActivityAttributes {
@@ -98,38 +98,38 @@ struct PizzaDeliveryAttributes: ActivityAttributes {
 }
 ```
 
-### 라이프사이클
+### Lifecycle
 
 pending → active → stale → ended/dismissed
 
 ```swift
-// 시작 (포그라운드에서만, 또는 Live Activity Intent)
+// Start (foreground only, or via Live Activity Intent)
 let activity = try Activity.request(attributes: attrs, content: content, pushType: .token)
 
-// 업데이트 (백그라운드 가능)
+// Update (can run in background)
 await activity.update(content)
 
-// 종료
+// End
 await activity.end(content, dismissalPolicy: .default)
 ```
 
 ### Dynamic Island
 
-- **Compact**: leading + trailing (단일 활동)
-- **Minimal**: 축약 표시 (복수 활동)
-- **Expanded**: 터치 시 center, leading, trailing, bottom 영역
+- **Compact**: leading + trailing (single activity)
+- **Minimal**: Abbreviated display (multiple activities)
+- **Expanded**: On tap: center, leading, trailing, bottom regions
 
-### 제약
+### Constraints
 
-- 최대 8시간 활성, 종료 후 잠금화면에 12시간
-- static + dynamic 데이터 합계 ≤ 4KB
-- 위젯 extension 내 네트워크/위치 접근 불가
+- Active for up to 8 hours, remains on the lock screen for 12 hours after ending
+- static + dynamic data combined ≤ 4KB
+- No network/location access within the widget extension
 
 ---
 
 ## App Intents
 
-### 기본 구조 (iOS 16+)
+### Basic Structure (iOS 16+)
 
 ```swift
 struct MyIntent: AppIntent {
@@ -139,22 +139,22 @@ struct MyIntent: AppIntent {
 }
 ```
 
-통합 포인트: Siri, Shortcuts, Spotlight, 위젯, Control Center, Apple Intelligence.
+Integration points: Siri, Shortcuts, Spotlight, widgets, Control Center, Apple Intelligence.
 
 ### App Intent Domains (iOS 18)
 
-12개 도메인의 미리 정의된 스키마 (도메인은 스키마 키패스에 포함):
+Predefined schemas across 12 domains (the domain is included in the schema key path):
 
 ```swift
 @AssistantIntent(schema: .mail.compose)
 struct ComposeMailIntent: AppIntent { ... }
 ```
 
-엔티티/열거형은 `@AssistantEntity(schema:)` / `@AssistantEnum(schema:)`.
+Entities/enums use `@AssistantEntity(schema:)` / `@AssistantEnum(schema:)`.
 
 ### IndexedEntity (iOS 18)
 
-Spotlight 시맨틱 검색에 엔티티 제공. "pets"로 검색하면 cats, dogs 결과.
+Provides entities for Spotlight semantic search. Searching "pets" returns cats, dogs results.
 
 ---
 
@@ -174,21 +174,21 @@ case .userCancelled, .pending: break
 }
 ```
 
-### Transaction 관리
+### Transaction Management
 
-- `Transaction.updates` — 외부/크로스 디바이스 구매 async sequence
-- `Transaction.currentEntitlements` — 현재 자격
-- JWS 검증 via `VerificationResult`
+- `Transaction.updates` — async sequence for external/cross-device purchases
+- `Transaction.currentEntitlements` — current entitlements
+- JWS verification via `VerificationResult`
 
 ### SwiftUI Views (iOS 17+)
 
-- `ProductView` — 개별 상품
-- `StoreView` — 상품 컬렉션
-- `SubscriptionStoreView` — 구독 관리 (iOS 18: win-back 오퍼, 커스텀 컨트롤 스타일)
+- `ProductView` — individual product
+- `StoreView` — product collection
+- `SubscriptionStoreView` — subscription management (iOS 18: win-back offers, custom control styles)
 
 ---
 
-## 백그라운드 처리
+## Background Processing
 
 ### BGTaskScheduler (iOS 13+)
 
@@ -202,29 +202,29 @@ request.earliestBeginDate = Date(timeIntervalSinceNow: 15 * 60)
 try BGTaskScheduler.shared.submit(request)
 ```
 
-- `BGAppRefreshTask` — 주기적 업데이트
-- `BGProcessingTask` — 장시간 계산 (외부 전원/네트워크)
-- `BGContinuedProcessingTask` — 포그라운드 작업의 백그라운드 계속, GPU 접근
+- `BGAppRefreshTask` — periodic updates
+- `BGProcessingTask` — long-running computation (external power/network)
+- `BGContinuedProcessingTask` — continues a foreground task in the background, GPU access
 
 ---
 
-## 푸시 알림
+## Push Notifications
 
 ### UNUserNotificationCenter
 
-- 인터럽션 레벨: `.passive`, `.active`, `.timeSensitive`, `.critical`
-- 트리거: `UNCalendarNotificationTrigger`, `UNTimeIntervalNotificationTrigger`, `UNLocationNotificationTrigger`
-- 카테고리/액션: `UNNotificationCategory` + `UNNotificationAction`
+- Interruption levels: `.passive`, `.active`, `.timeSensitive`, `.critical`
+- Triggers: `UNCalendarNotificationTrigger`, `UNTimeIntervalNotificationTrigger`, `UNLocationNotificationTrigger`
+- Category/action: `UNNotificationCategory` + `UNNotificationAction`
 
 ### Notification Service Extension
 
-`mutable-content: 1` 시 활성화. 콘텐츠 수정, 미디어 다운로드 등.
+Activated when `mutable-content: 1` is set. Content modification, media download, etc.
 
 ---
 
 ## TipKit
 
-### 기본 (iOS 17+)
+### Basics (iOS 17+)
 
 ```swift
 struct FavoriteTip: Tip {
@@ -232,13 +232,13 @@ struct FavoriteTip: Tip {
     var message: Text? { Text("Tap the heart icon") }
 }
 
-// 인라인
+// Inline
 TipView(FavoriteTip())
 
-// 팝오버
+// Popover
 .popoverTip(FavoriteTip())
 ```
 
-- 규칙: Parameter 기반 (영속 상태) + Event 기반 (`donate()`)
+- Rules: Parameter-based (persistent state) + Event-based (`donate()`)
 - `.maxDisplayCount`, `.invalidate(reason: .userPerformedAction)`
-- iCloud 동기화 자동
+- Automatic iCloud sync

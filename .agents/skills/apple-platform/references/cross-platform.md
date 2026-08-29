@@ -1,24 +1,24 @@
 # Cross-Platform Reference
 
 ## Table of Contents
-1. [조건부 컴파일](#조건부-컴파일)
-2. [프로젝트 구조](#프로젝트-구조)
-3. [플랫폼별 적응 패턴](#플랫폼별-적응-패턴)
-4. [Scene 타입 가용성](#scene-타입-가용성)
-5. [주요 API 최소 버전](#주요-api-최소-버전)
+1. [Conditional Compilation](#conditional-compilation)
+2. [Project Structure](#project-structure)
+3. [Platform-Specific Adaptation Patterns](#platform-specific-adaptation-patterns)
+4. [Scene Type Availability](#scene-type-availability)
+5. [Key API Minimum Versions](#key-api-minimum-versions)
 
 ---
 
-## 조건부 컴파일
+## Conditional Compilation
 
-### 선호도 순서
+### Order of Preference
 
-1. **`@available` / `if #available`** — 버전 게이트 API
-2. **`#if canImport()`** — 프레임워크 조건부 코드
-3. **`#if os()`** — OS 수준 구분이 필요할 때만
-4. **`#if targetEnvironment()`** — 시뮬레이터/Catalyst 엣지 케이스
+1. **`@available` / `if #available`** — version-gated APIs
+2. **`#if canImport()`** — framework-conditional code
+3. **`#if os()`** — only when OS-level distinction is needed
+4. **`#if targetEnvironment()`** — simulator/Catalyst edge cases
 
-### #if canImport() — 프레임워크 가용성
+### #if canImport() — Framework Availability
 
 ```swift
 #if canImport(UIKit)
@@ -30,40 +30,40 @@ typealias PlatformColor = NSColor
 #endif
 ```
 
-`#if os()`보다 선호 — 프레임워크가 새 플랫폼에 추가되면 자동 컴파일.
-Mac Catalyst에서 더 정확.
+Preferred over `#if os()` — automatically compiles when the framework is added to a new platform.
+More accurate on Mac Catalyst.
 
-### #if os() — 플랫폼별 코드
+### #if os() — Platform-Specific Code
 
 ```swift
 #if os(iOS)
-// iOS 전용
+// iOS only
 #elseif os(macOS)
-// macOS 전용
+// macOS only
 #elseif os(visionOS)
-// visionOS 전용
+// visionOS only
 #endif
 ```
 
-유효 이름: `iOS`, `macOS`, `watchOS`, `tvOS`, `visionOS`, `Linux`, `Windows`, `Android`
+Valid names: `iOS`, `macOS`, `watchOS`, `tvOS`, `visionOS`, `Linux`, `Windows`, `Android`
 
 ### #if targetEnvironment()
 
 ```swift
 #if targetEnvironment(simulator)
-// 시뮬레이터 전용 (센서 대체)
+// Simulator only (sensor substitute)
 #endif
 
 #if targetEnvironment(macCatalyst)
-// Mac Catalyst 전용 조정
+// Mac Catalyst-only adjustments
 #endif
 ```
 
-### 런타임 체크
+### Runtime Checks
 
 ```swift
 if #available(iOS 17, macOS 14, visionOS 1, *) {
-    // 새 API 사용
+    // Use new API
 } else {
     // fallback
 }
@@ -74,15 +74,15 @@ func useNewFeature() { ... }
 
 ---
 
-## 프로젝트 구조
+## Project Structure
 
-### 방법 1: Multiplatform Xcode Project (앱에 권장)
+### Method 1: Multiplatform Xcode Project (recommended for apps)
 
-- 단일 타겟 + 복수 플랫폼 destination
-- General > Supported Destinations에서 추가
-- `#if os()` / `#if canImport()`로 플랫폼별 코드
+- Single target + multiple platform destinations
+- Add via General > Supported Destinations
+- Platform-specific code via `#if os()` / `#if canImport()`
 
-### 방법 2: Swift Package (공유 로직)
+### Method 2: Swift Package (shared logic)
 
 ```swift
 let package = Package(
@@ -93,44 +93,44 @@ let package = Package(
 )
 ```
 
-### 권장 디렉토리 구조
+### Recommended Directory Structure
 
 ```
 MyApp/
-├── Shared/           # 크로스 플랫폼 뷰, 모델, 유틸리티
-├── iOS/              # iOS 전용
-├── macOS/            # macOS 전용
-├── watchOS/          # watchOS 앱 & complications
-├── tvOS/             # tvOS 전용
-├── visionOS/         # 몰입형 콘텐츠, volume
+├── Shared/           # Cross-platform views, models, utilities
+├── iOS/              # iOS only
+├── macOS/            # macOS only
+├── watchOS/          # watchOS app & complications
+├── tvOS/             # tvOS only
+├── visionOS/         # Immersive content, volume
 └── Packages/
-    └── CoreKit/      # 비즈니스 로직 Swift 패키지
+    └── CoreKit/      # Business logic Swift package
 ```
 
-### 원칙
+### Principles
 
-- 모델, 뷰 모델은 100% 공유
-- 공유 SwiftUI 뷰에서 시작, 필요할 때만 플랫폼 특화
-- `ViewThatFits`로 반응형 레이아웃
-- `AnyLayout`으로 사이즈 클래스 간 레이아웃 전환 애니메이션
+- Models and view models are 100% shared
+- Start with shared SwiftUI views, specialize per platform only when necessary
+- Responsive layout via `ViewThatFits`
+- Animate layout transitions between size classes with `AnyLayout`
 
 ---
 
-## 플랫폼별 적응 패턴
+## Platform-Specific Adaptation Patterns
 
-### NavigationSplitView 적응
+### NavigationSplitView Adaptation
 
-| 플랫폼 | 동작 |
+| Platform | Behavior |
 |--------|------|
-| iPad (regular) | 멀티 컬럼 |
-| iPad (compact/Slide Over) | 스택으로 축소 |
-| iPhone | 항상 스택 |
-| macOS | 멀티 컬럼 + 리사이즈 사이드바 |
-| watchOS | 스택 |
-| tvOS | 스택 |
-| visionOS | 멀티 컬럼 |
+| iPad (regular) | Multi-column |
+| iPad (compact/Slide Over) | Collapses to a stack |
+| iPhone | Always a stack |
+| macOS | Multi-column + resizable sidebar |
+| watchOS | Stack |
+| tvOS | Stack |
+| visionOS | Multi-column |
 
-### TabView 적응
+### TabView Adaptation
 
 ```swift
 TabView {
@@ -139,43 +139,43 @@ TabView {
 .tabViewStyle(.sidebarAdaptable)
 ```
 
-| 플랫폼 | 동작 |
+| Platform | Behavior |
 |--------|------|
-| iPhone | 하단 탭바 (iOS 26: 컴팩트) |
-| iPad | 사이드바 ↔ 탭바 전환 |
-| macOS | 사이드바 또는 세그먼트 컨트롤 |
-| tvOS | 상단 탭바, tvOS 18+ 사이드바 |
-| visionOS | 좌측 수직, 시선으로 확장 |
-| watchOS | N/A (수직 TabView) |
+| iPhone | Bottom tab bar (iOS 26: compact) |
+| iPad | Switches between sidebar ↔ tab bar |
+| macOS | Sidebar or segmented control |
+| tvOS | Top tab bar, sidebar on tvOS 18+ |
+| visionOS | Vertical on the left, expands on gaze |
+| watchOS | N/A (vertical TabView) |
 
-### Toolbar 배치 차이
+### Toolbar Placement Differences
 
 ```swift
 .toolbar {
-    ToolbarItem(placement: .primaryAction) { /* 플랫폼별 최적 위치 */ }
-    ToolbarItem(placement: .bottomOrnament) { /* visionOS 전용 ornament */ }
-    ToolbarItem(placement: .bottomBar) { /* iOS 하단 툴바 */ }
+    ToolbarItem(placement: .primaryAction) { /* platform-optimal placement */ }
+    ToolbarItem(placement: .bottomOrnament) { /* visionOS-only ornament */ }
+    ToolbarItem(placement: .bottomBar) { /* iOS bottom toolbar */ }
 }
 ```
 
-- `bottomOrnament` — visionOS 전용
-- `automatic` — 시스템이 최적 배치 결정
+- `bottomOrnament` — visionOS only
+- `automatic` — The system determines the optimal placement
 
-### 입력 방식 차이
+### Input Method Differences
 
-| 플랫폼 | 기본 | 보조 |
+| Platform | Primary | Secondary |
 |--------|------|------|
-| iOS/iPadOS | 터치 | Pencil, 키보드, 포인터 |
-| macOS | 마우스/트랙패드 + 키보드 | — |
-| watchOS | 터치 + Digital Crown | 더블탭 제스처 |
-| tvOS | Siri Remote (포커스) | 게임 컨트롤러 |
-| visionOS | 시선 + 핀치 | 트랙패드, 게임 컨트롤러 |
+| iOS/iPadOS | Touch | Pencil, keyboard, pointer |
+| macOS | Mouse/trackpad + keyboard | — |
+| watchOS | Touch + Digital Crown | Double-tap gesture |
+| tvOS | Siri Remote (focus) | Game controller |
+| visionOS | Gaze + pinch | Trackpad, game controller |
 
 ---
 
-## Scene 타입 가용성
+## Scene Type Availability
 
-| Scene | 플랫폼 |
+| Scene | Platforms |
 |-------|--------|
 | `WindowGroup` | iOS 14+, macOS 11+, tvOS 14+, watchOS 7+, visionOS 1+ |
 | `Window` | macOS 13+ |
@@ -188,7 +188,7 @@ TabView {
 
 ---
 
-## 주요 API 최소 버전
+## Key API Minimum Versions
 
 | API | iOS | macOS | watchOS | tvOS | visionOS |
 |-----|-----|-------|---------|------|----------|
@@ -203,11 +203,11 @@ TabView {
 
 ### Mac Catalyst
 
-SwiftUI 성숙으로 관련성 감소. 기존 UIKit iPad 코드베이스에 유용.
-새 프로젝트는 SwiftUI + `#if os(macOS)` 또는 `NSViewRepresentable` 선호.
+Relevance has declined as SwiftUI has matured. Useful for existing UIKit iPad codebases.
+New projects should prefer SwiftUI + `#if os(macOS)` or `NSViewRepresentable`.
 
 ```swift
 #if targetEnvironment(macCatalyst)
-// Catalyst 전용 조정
+// Catalyst-only adjustments
 #endif
 ```

@@ -1,41 +1,41 @@
 # macOS Platform Reference
 
 ## Table of Contents
-1. [앱 라이프사이클](#앱-라이프사이클)
-2. [윈도우 관리](#윈도우-관리)
-3. [메뉴바 앱](#메뉴바-앱)
-4. [문서 기반 앱](#문서-기반-앱)
-5. [메뉴 & 키보드 단축키](#메뉴--키보드-단축키)
+1. [App Lifecycle](#app-lifecycle)
+2. [Window Management](#window-management)
+3. [Menu Bar Apps](#menu-bar-apps)
+4. [Document-Based Apps](#document-based-apps)
+5. [Menus & Keyboard Shortcuts](#menus--keyboard-shortcuts)
 6. [Settings](#settings)
-7. [샌드박싱 & 보안](#샌드박싱--보안)
-8. [공증 & 배포](#공증--배포)
-9. [macOS 고유 SwiftUI 패턴](#macos-고유-swiftui-패턴)
+7. [Sandboxing & Security](#sandboxing--security)
+8. [Notarization & Distribution](#notarization--distribution)
+9. [macOS-Specific SwiftUI Patterns](#macos-specific-swiftui-patterns)
 
 ---
 
-## 앱 라이프사이클
+## App Lifecycle
 
 ### Activation Policy
 
-| 정책 | Dock 아이콘 | 메뉴바 | 윈도우 |
+| Policy | Dock Icon | Menu Bar | Window |
 |------|------------|--------|--------|
 | `.regular` | O | O | O |
-| `.accessory` | X | X | O (활성화 가능) |
-| `.prohibited` | X | X | X (백그라운드 전용) |
+| `.accessory` | X | X | O (can be activated) |
+| `.prohibited` | X | X | X (background only) |
 
-### NSApplicationDelegate 핵심
+### NSApplicationDelegate Essentials
 
-- `applicationShouldTerminateAfterLastWindowClosed(_:)` → `true` 반환 시 자동 종료
-- `applicationShouldHandleReopen(_:hasVisibleWindows:)` → Dock 클릭 처리
-- `applicationDockMenu(_:)` → Dock 우클릭 메뉴
+- `applicationShouldTerminateAfterLastWindowClosed(_:)` → terminates automatically when it returns `true`
+- `applicationShouldHandleReopen(_:hasVisibleWindows:)` → handles Dock clicks
+- `applicationDockMenu(_:)` → Dock right-click menu
 
 ---
 
-## 윈도우 관리
+## Window Management
 
-### SwiftUI Scene 타입
+### SwiftUI Scene Types
 
-**WindowGroup** — 동일 구조의 복수 윈도우:
+**WindowGroup** — multiple windows of the same structure:
 ```swift
 WindowGroup {
     ContentView()
@@ -44,46 +44,46 @@ WindowGroup {
 .defaultPosition(.center)
 ```
 
-**Window** (macOS 13+) — 단일 고유 윈도우:
+**Window** (macOS 13+) — a single unique window:
 ```swift
 Window("Connection Doctor", id: "connection-doctor") {
     ConnectionDoctor()
 }
 ```
 
-**UtilityWindow** (macOS 15+) — 플로팅 도구 팔레트/인스펙터:
+**UtilityWindow** (macOS 15+) — floating tool palette/inspector:
 ```swift
 UtilityWindow("Photo Info", id: "photo-info") {
     PhotoInfoViewer()
 }
 ```
-- FocusedValues를 포커스된 메인 씬에서 수신
-- 부모 포커스 잃으면 자동 숨김
-- View 메뉴에 show/hide 항목 자동 추가
+- Receives FocusedValues from the focused main scene
+- Automatically hides when the parent loses focus
+- Automatically adds a show/hide item to the View menu
 
-### 윈도우 크기 & 위치 (macOS 13+)
+### Window Size & Position (macOS 13+)
 
 ```swift
 .defaultSize(width: 600, height: 400)
 .defaultPosition(.topLeading)
-.windowResizability(.contentSize)        // 콘텐츠에 고정
-.windowResizability(.contentMinSize)     // 확장 가능
+.windowResizability(.contentSize)        // fixed to content
+.windowResizability(.contentMinSize)     // expandable
 .defaultWindowPlacement { content, context in ... }  // macOS 15+
 ```
 
-### 프로그래매틱 제어
+### Programmatic Control
 
 ```swift
 @Environment(\.openWindow) private var openWindow
 @Environment(\.dismiss) private var dismiss
 
 openWindow(id: "mail-viewer")
-openWindow(id: "message", value: messageID)  // Hashable + Codable 데이터
+openWindow(id: "message", value: messageID)  // Hashable + Codable data
 ```
 
 ---
 
-## 메뉴바 앱
+## Menu Bar Apps
 
 ### MenuBarExtra (SwiftUI, macOS 13+)
 
@@ -98,13 +98,13 @@ struct UtilityApp: App {
 }
 ```
 
-- `.menuBarExtraStyle(.window)` — 팝오버 스타일
-- `isInserted` 바인딩으로 가시성 제어
-- Dock 없는 앱: `LSUIElement = true` (Info.plist)
+- `.menuBarExtraStyle(.window)` — popover style
+- Control visibility with the `isInserted` binding
+- App without a Dock icon: `LSUIElement = true` (Info.plist)
 
 ---
 
-## 문서 기반 앱
+## Document-Based Apps
 
 ### DocumentGroup (SwiftUI)
 
@@ -114,13 +114,13 @@ DocumentGroup(newDocument: TextFile()) { config in
 }
 ```
 
-- `FileDocument` (값 타입, `Sendable`) 또는 `ReferenceFileDocument` (참조 타입)
-- 직렬화를 `@MainActor`에서 수행하지 않는다
-- SwiftData 기반 문서 지원
+- `FileDocument` (value type, `Sendable`) or `ReferenceFileDocument` (reference type)
+- Do not perform serialization on `@MainActor`
+- SwiftData-based document support
 
 ---
 
-## 메뉴 & 키보드 단축키
+## Menus & Keyboard Shortcuts
 
 ### Commands (macOS 11+)
 
@@ -136,13 +136,13 @@ DocumentGroup(newDocument: TextFile()) { config in
 }
 ```
 
-- `CommandGroupPlacement`: `.appInfo`, `.appSettings`, `.newItem`, `.saveItem`, `.undoRedo`, `.pasteboard`, `.sidebar`, `.toolbar`, `.help` 등
-- `.commandsRemoved()` — 기본 커맨드 제거
-- `onKeyPress` (macOS 14+) — focusable 뷰에서 하드웨어 키보드 입력
+- `CommandGroupPlacement`: `.appInfo`, `.appSettings`, `.newItem`, `.saveItem`, `.undoRedo`, `.pasteboard`, `.sidebar`, `.toolbar`, `.help`, etc.
+- `.commandsRemoved()` — removes default commands
+- `onKeyPress` (macOS 14+) — hardware keyboard input in a focusable view
 
-### FocusedValues — 멀티 윈도우
+### FocusedValues — Multi-Window
 
-`@FocusedValue` — 포커스된 뷰 계층의 값 관찰. 메뉴/커맨드를 활성 윈도우 상태에 연결하는 핵심.
+`@FocusedValue` — observes values from the focused view hierarchy. The key to connecting menus/commands to the active window's state.
 
 ---
 
@@ -163,60 +163,60 @@ Settings {
 #endif
 ```
 
-자동으로 Settings 메뉴 항목 (Cmd+,) 생성.
-`SettingsLink` (macOS 14+), `openSettings` environment action으로 프로그래매틱 접근.
+Automatically creates the Settings menu item (Cmd+,).
+`SettingsLink` (macOS 14+), programmatic access via the `openSettings` environment action.
 
 ---
 
-## 샌드박싱 & 보안
+## Sandboxing & Security
 
-### App Sandbox 주요 entitlement
+### Key App Sandbox Entitlements
 
-| entitlement | 용도 |
+| entitlement | Purpose |
 |---|---|
-| `com.apple.security.app-sandbox` | 샌드박스 활성화 (Mac App Store 필수) |
-| `.network.client` | 아웃바운드 네트워크 |
-| `.network.server` | 인바운드 네트워크 |
-| `.device.camera` | 카메라 |
-| `.device.microphone` | 마이크 |
-| `.files.user-selected.read-write` | 사용자 선택 파일 읽기/쓰기 |
-| `.files.downloads.read-write` | Downloads 폴더 |
+| `com.apple.security.app-sandbox` | Enables sandboxing (required for Mac App Store) |
+| `.network.client` | Outbound network |
+| `.network.server` | Inbound network |
+| `.device.camera` | Camera |
+| `.device.microphone` | Microphone |
+| `.files.user-selected.read-write` | Read/write user-selected files |
+| `.files.downloads.read-write` | Downloads folder |
 
 ### Security-Scoped URL
 
 ```swift
 let gotAccess = url.startAccessingSecurityScopedResource()
 defer { url.stopAccessingSecurityScopedResource() }
-// url 사용
+// use url
 ```
 
-`fileImporter` 등으로 얻은 URL에서 필요.
+Required for URLs obtained via `fileImporter`, etc.
 
 ---
 
-## 공증 & 배포
+## Notarization & Distribution
 
-### 요구사항
+### Requirements
 
-- Developer ID 인증서로 코드 서명
-- Hardened Runtime 활성화
-- secure timestamp 포함
-- `com.apple.security.get-task-allow` entitlement 제거
+- Code sign with a Developer ID certificate
+- Enable Hardened Runtime
+- Include a secure timestamp
+- Remove the `com.apple.security.get-task-allow` entitlement
 
-### 워크플로우
+### Workflow
 
-- **Xcode**: Archive → Organizer → Distribute App → Developer ID → Upload (자동 staple)
-- **CLI**: `notarytool` 사용 (`altool`은 2023.11 deprecated)
-- 처리 시간: 보통 1시간 이내
+- **Xcode**: Archive → Organizer → Distribute App → Developer ID → Upload (automatic stapling)
+- **CLI**: Use `notarytool` (`altool` deprecated as of 2023.11)
+- Processing time: usually under 1 hour
 
-### 배포 경로
+### Distribution Paths
 
-- **Mac App Store**: 공증 불필요 (제출 과정에 포함)
-- **Developer ID**: 공증 필수
+- **Mac App Store**: No notarization needed (included in the submission process)
+- **Developer ID**: Notarization required
 
 ---
 
-## macOS 고유 SwiftUI 패턴
+## macOS-Specific SwiftUI Patterns
 
 ### Inspector (macOS 14+)
 
@@ -227,35 +227,35 @@ defer { url.stopAccessingSecurityScopedResource() }
 .inspectorColumnWidth(min: 200, ideal: 300, max: 400)
 ```
 
-macOS: trailing 사이드바. compact에서: sheet.
+macOS: trailing sidebar. In compact: sheet.
 
 ### Context Menu
 
-macOS: 우클릭 (미리보기 없음, iOS와 다름).
-`contextMenu(forSelectionType:menu:primaryAction:)` — List/Table 선택 인식.
+macOS: right-click (no preview, unlike iOS).
+`contextMenu(forSelectionType:menu:primaryAction:)` — recognizes List/Table selection.
 
 ### Hover
 
 ```swift
 .onHover { isHovering in ... }
-.onContinuousHover { phase in ... }  // 좌표 추적
+.onContinuousHover { phase in ... }  // coordinate tracking
 ```
 
 ### External Event Routing
 
 ```swift
-.handlesExternalEvents(matching: Set<String>)     // scene 수준
-.handlesExternalEvents(preferring:allowing:)       // view 수준 — URL 라우팅
+.handlesExternalEvents(matching: Set<String>)     // scene level
+.handlesExternalEvents(preferring:allowing:)       // view level — URL routing
 ```
 
-### macOS vs iOS 차이
+### macOS vs iOS Differences
 
 | macOS | iOS |
 |-------|-----|
-| 다중 리사이즈 가능 윈도우 | 단일 윈도우 (iPad 제한적 멀티) |
-| 전체 메뉴바 + Cmd 단축키 | 메뉴바 없음 |
-| 키보드 우선 네비게이션 | 터치 우선 |
-| hover, 우클릭 | 터치, 롱프레스 |
-| 5가지 툴바 스타일 | 표준 네비게이션바 |
-| Settings scene (Cmd+,) | 인앱 설정 또는 Settings.app |
-| App Store 또는 Developer ID | App Store 전용 |
+| Multiple resizable windows | Single window (limited multi on iPad) |
+| Full menu bar + Cmd shortcuts | No menu bar |
+| Keyboard-first navigation | Touch-first |
+| hover, right-click | touch, long-press |
+| 5 toolbar styles | Standard navigation bar |
+| Settings scene (Cmd+,) | In-app settings or Settings.app |
+| App Store or Developer ID | App Store only |

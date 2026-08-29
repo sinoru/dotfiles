@@ -1,36 +1,36 @@
 # Combine & Reactive Patterns Reference
 
-## 현재 상태
+## Current Status
 
-Combine은 **사실상 유지보수 모드**. 공식 deprecated는 아니지만 WWDC 2022 이후 새 세션이나 API 추가가 없다.
-Apple의 투자는 Swift Concurrency(`async/await`, `AsyncSequence`, `@Observable`)로 완전히 이동.
+Combine is **effectively in maintenance mode**. It is not officially deprecated, but there have been no new sessions or API additions since WWDC 2022.
+Apple's investment has fully shifted to Swift Concurrency (`async/await`, `AsyncSequence`, `@Observable`).
 
-핵심 시그널:
-- WWDC 2023: `@Observable` 매크로 도입 → `ObservableObject` + `@Published`(Combine 기반)의 주요 사용처 대체
-- Swift Async Algorithms 패키지: `debounce`, `throttle`, `merge`, `combineLatest` 등 Combine 핵심 operator의 async 버전 제공
-- Combine은 Swift 6 strict concurrency annotation을 받지 못함
+Key signals:
+- WWDC 2023: `@Observable` macro introduced → replaces the main use case of `ObservableObject` + `@Published` (Combine-based)
+- Swift Async Algorithms package: provides async versions of Combine's core operators — `debounce`, `throttle`, `merge`, `combineLatest`, etc.
+- Combine does not receive Swift 6 strict concurrency annotations
 
-## 언제 Combine을 쓸까
+## When to Use Combine
 
-- **iOS 13-14 / macOS 10.15-11** 타겟 (AsyncSequence는 iOS 15+)
-- **명시적 back-pressure**가 필요한 복잡한 스트림 조합
-- **기존 대규모 Combine 코드베이스** — 마이그레이션 비용 > 이점
-- **SwiftUI `onReceive`** — 여전히 Combine `Publisher` 필요
-- **`switchToLatest`, `share`/`multicast`, `buffer` 정책** — async 대응 없음
+- **iOS 13-14 / macOS 10.15-11** targets (AsyncSequence is iOS 15+)
+- Complex stream composition requiring **explicit back-pressure**
+- **Existing large-scale Combine codebases** — migration cost > benefit
+- **SwiftUI `onReceive`** — still requires a Combine `Publisher`
+- **`switchToLatest`, `share`/`multicast`, `buffer` policies** — no async equivalent
 
-## 언제 AsyncSequence를 쓸까
+## When to Use AsyncSequence
 
-- **새 프로젝트 (iOS 15+ / macOS 12+)** — async/await가 기본
-- **SwiftUI + `@Observable` (iOS 17+)** — Combine 불필요
-- **`.task { }` 수정자** — 뷰 라이프사이클 연동 async
-- **서버 사이드 Swift** — Combine은 Apple 전용, AsyncSequence는 표준 라이브러리
+- **New projects (iOS 15+ / macOS 12+)** — async/await is the default
+- **SwiftUI + `@Observable` (iOS 17+)** — Combine unnecessary
+- **`.task { }` modifier** — async tied to view lifecycle
+- **Server-side Swift** — Combine is Apple-only, AsyncSequence is part of the standard library
 
 ## Migration Patterns
 
 ### Publisher → AsyncSequence (.values)
 
 ```swift
-// Failure == Never인 Publisher
+// Publisher where Failure == Never
 for await value in publisher.values {
     process(value)
 }
@@ -49,50 +49,50 @@ let publisher = Future<Data, Error> { promise in
 }
 ```
 
-### @Observable이 ObservableObject를 대체
+### @Observable Replaces ObservableObject
 
 ```swift
-// 이전: Combine 기반
+// Before: Combine-based
 class Library: ObservableObject {
     @Published var books: [Book] = []
 }
-// @StateObject, @ObservedObject, @EnvironmentObject 사용
+// Use @StateObject, @ObservedObject, @EnvironmentObject
 
-// 이후: Combine 불필요
+// After: Combine unnecessary
 @Observable class Library {
     var books: [Book] = []
 }
-// @State, plain property, @Environment(Type.self) 사용
+// Use @State, plain property, @Environment(Type.self)
 ```
 
-주의: `@Observable`에서 `$` 접두사는 Combine `Publisher`가 아니라 SwiftUI `Binding`을 생성.
-`.debounce` 같은 Combine 체이닝 불가 — Swift Async Algorithms 또는 `Task` 기반 debounce 사용.
+Note: with `@Observable`, the `$` prefix produces a SwiftUI `Binding`, not a Combine `Publisher`.
+Combine chaining like `.debounce` is not possible — use Swift Async Algorithms or a `Task`-based debounce.
 
-## Operator 대응표
+## Operator Mapping
 
-| Combine | Async 대응 | 출처 |
+| Combine | Async Equivalent | Source |
 |---------|-----------|------|
-| `map`, `compactMap`, `filter`, `flatMap` | 동명 메서드 | stdlib |
-| `reduce`, `first(where:)`, `prefix`, `dropFirst` | 동명 메서드 | stdlib |
+| `map`, `compactMap`, `filter`, `flatMap` | Same-named methods | stdlib |
+| `reduce`, `first(where:)`, `prefix`, `dropFirst` | Same-named methods | stdlib |
 | `debounce`, `throttle` | `debounce(for:clock:)`, `throttle(for:clock:)` | swift-async-algorithms |
 | `merge`, `combineLatest`, `zip` | `merge`, `combineLatest`, `zip` | swift-async-algorithms |
 | `removeDuplicates` | `removeDuplicates` | swift-async-algorithms |
 | `Timer.publish` | `AsyncTimerSequence` | swift-async-algorithms |
-| `sink` | `for await` 루프 | — |
-| `assign(to:)` | `for await` 안에서 직접 할당 | — |
-| `receive(on: .main)` | `@MainActor` 격리 | — |
-| `scan`, `switchToLatest`, `share`/`multicast` | **대응 없음** | — |
+| `sink` | `for await` loop | — |
+| `assign(to:)` | Direct assignment inside `for await` | — |
+| `receive(on: .main)` | `@MainActor` isolation | — |
+| `scan`, `switchToLatest`, `share`/`multicast` | **No equivalent** | — |
 
-## SwiftUI와의 통합
+## Integration with SwiftUI
 
-- **iOS 17+**: `@Observable` + `@State`로 Combine 없이 데이터 흐름 완성
-- **`onReceive`**: Combine Publisher를 뷰에서 소비하는 유일한 방법 (여전히 유효)
+- **iOS 17+**: `@Observable` + `@State` completes data flow without Combine
+- **`onReceive`**: the only way to consume a Combine Publisher from a view (still valid)
   ```swift
   .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
       refreshData()
   }
   ```
-- **`.task(id:)`로 debounce 대체**:
+- **Replacing debounce with `.task(id:)`**:
   ```swift
   .task(id: searchQuery) {
       try? await Task.sleep(for: .milliseconds(300))
@@ -100,7 +100,7 @@ class Library: ObservableObject {
   }
   ```
 
-## 요약
+## Summary
 
-새 코드는 `async/await` + `@Observable`. Combine은 `.values`로 점진적 마이그레이션.
-고유 기능(`switchToLatest`, back-pressure, `onReceive`)이 필요할 때만 Combine 유지.
+New code should use `async/await` + `@Observable`. Migrate Combine incrementally via `.values`.
+Keep Combine only when a unique capability (`switchToLatest`, back-pressure, `onReceive`) is needed.

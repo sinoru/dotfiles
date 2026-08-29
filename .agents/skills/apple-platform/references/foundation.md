@@ -1,34 +1,34 @@
 # Foundation Reference
 
 ## Table of Contents
-1. [FormatStyle — 현대적 포매팅](#formatstyle--현대적-포매팅)
+1. [FormatStyle — Modern Formatting](#formatstyle--modern-formatting)
 2. [AttributedString](#attributedstring)
 3. [Async Foundation API](#async-foundation-api)
 4. [KVO in Swift vs @Observable](#kvo-in-swift-vs-observable)
-5. [Codable 패턴](#codable-패턴)
+5. [Codable Patterns](#codable-patterns)
 6. [Predicate](#predicate)
 7. [RegexBuilder](#regexbuilder)
 8. [Duration & Clock](#duration--clock)
 9. [FileManager & Data](#filemanager--data)
 10. [UserDefaults](#userdefaults)
-11. [Deprecated 패턴 대응표](#deprecated-패턴-대응표)
+11. [Deprecated Pattern Mapping](#deprecated-pattern-mapping)
 
 ---
 
-## FormatStyle — 현대적 포매팅
+## FormatStyle — Modern Formatting
 
 ### iOS 15+ / macOS 12+
 
-`DateFormatter`, `NumberFormatter` 등을 대체. Foundation이 동일 FormatStyle 인스턴스를 자동 캐싱하므로 기존의 "formatter를 캐싱하라" 보일러플레이트 불필요.
+Replaces `DateFormatter`, `NumberFormatter`, etc. Foundation automatically caches identical FormatStyle instances, so the old "cache your formatter" boilerplate is unnecessary.
 
 ### Date
 
 ```swift
-Date.now.formatted()                                          // 기본
-Date.now.formatted(date: .abbreviated, time: .shortened)      // 프리셋
-Date.now.formatted(.dateTime.year().month(.wide).day())        // 커스텀 필드
+Date.now.formatted()                                          // default
+Date.now.formatted(date: .abbreviated, time: .shortened)      // preset
+Date.now.formatted(.dateTime.year().month(.wide).day())        // custom fields
 Date.now.formatted(.iso8601.year().month().day())              // ISO 8601
-startDate.formatted(.relative(presentation: .numeric))        // "2시간 전"
+startDate.formatted(.relative(presentation: .numeric))        // "2 hours ago"
 ```
 
 ### Number
@@ -40,20 +40,20 @@ startDate.formatted(.relative(presentation: .numeric))        // "2시간 전"
 42.formatted(.number.notation(.scientific))
 ```
 
-### 파싱
+### Parsing
 
 ```swift
 let date = try Date("2021-04-11", strategy: .iso8601)
 ```
 
-### Attributed 출력
+### Attributed Output
 
 ```swift
 let attributed = Date.now.formatted(.dateTime.attributed)
-// AttributedString 반환 — 각 필드에 별도 스타일 적용 가능
+// Returns AttributedString — separate styling can be applied per field
 ```
 
-### 기타 FormatStyle
+### Other FormatStyles
 
 `ListFormatStyle`, `ByteCountFormatStyle`, `Measurement.FormatStyle`,
 `PersonNameComponents.FormatStyle`, `URL.FormatStyle`,
@@ -65,27 +65,27 @@ let attributed = Date.now.formatted(.dateTime.attributed)
 
 ### iOS 15+ / macOS 12+
 
-`NSAttributedString`의 Swift 네이티브 대체. 값 타입, Codable, Sendable.
+Swift-native replacement for `NSAttributedString`. Value type, Codable, Sendable.
 
 ```swift
-// 생성 및 수정
+// Create and modify
 var str = AttributedString("Hello")
 str.font = .title
 str[range].foregroundColor = .orange
 
-// Attribute container로 일괄 설정
+// Set in bulk via Attribute container
 var container = AttributeContainer()
 container.font = .body
 str.mergeAttributes(container)
 
-// Markdown 지원
+// Markdown support
 let md = try AttributedString(markdown: "**Bold** and _italic_")
 
-// NSAttributedString 변환
+// Convert to NSAttributedString
 let ns = NSAttributedString(str)
 ```
 
-### 커스텀 속성
+### Custom Attributes
 
 ```swift
 struct RainbowAttribute: AttributedStringKey {
@@ -94,14 +94,14 @@ struct RainbowAttribute: AttributedStringKey {
 }
 ```
 
-### NSAttributedString과의 차이
+### Differences from NSAttributedString
 
 | NSAttributedString | AttributedString |
 |---|---|
-| 참조 타입 (class) | 값 타입 (struct) |
+| Reference type (class) | Value type (struct) |
 | NSRange (UTF-16) | String.Index (Character) |
-| 런타임 키 (`NSAttributedString.Key`) | 컴파일 타임 타입 안전 |
-| Codable 아님 | Codable, Sendable |
+| Runtime key (`NSAttributedString.Key`) | Compile-time type safety |
+| Not Codable | Codable, Sendable |
 
 ---
 
@@ -111,11 +111,11 @@ struct RainbowAttribute: AttributedStringKey {
 
 ```swift
 for await notification in NotificationCenter.default.notifications(named: .myNotification) {
-    // Sendable 값만 추출하여 처리
+    // Only extract and process Sendable values
 }
 ```
 
-selector 기반 `addObserver` 대체. 구조적 동시성과 자연스럽게 통합.
+Replaces selector-based `addObserver`. Integrates naturally with structured concurrency.
 
 ### URLSession (iOS 15+)
 
@@ -123,23 +123,23 @@ selector 기반 `addObserver` 대체. 구조적 동시성과 자연스럽게 통
 // Data
 let (data, response) = try await URLSession.shared.data(from: url)
 
-// Download (파일 URL 반환, 호출자가 정리)
+// Download (returns file URL, caller must clean up)
 let (fileURL, response) = try await URLSession.shared.download(from: url)
 
 // Upload
 let (data, response) = try await URLSession.shared.upload(for: request, from: bodyData)
 
-// 스트리밍 bytes
+// Streaming bytes
 let (bytes, response) = try await URLSession.shared.bytes(from: url)
 for try await line in bytes.lines {
-    // 도착하는 대로 줄 단위 처리
+    // Process line by line as it arrives
 }
 
-// 태스크별 delegate (인증 챌린지 등)
+// Per-task delegate (auth challenges, etc.)
 let (data, response) = try await URLSession.shared.data(from: url, delegate: myDelegate)
 ```
 
-completion handler 기반 API를 완전히 대체.
+Completely replaces completion-handler-based APIs.
 
 ### URL / FileHandle
 
@@ -152,14 +152,14 @@ for try await byte in url.resourceBytes { ... }
 
 ## KVO in Swift vs @Observable
 
-### KVO (NSObject 전용)
+### KVO (NSObject only)
 
 ```swift
 class MyModel: NSObject {
     @objc dynamic var name: String = ""
 }
 
-// Block 기반 관찰
+// Block-based observation
 let observation = model.observe(\.name, options: [.old, .new]) { obj, change in
     print(change.newValue!)
 }
@@ -169,30 +169,30 @@ let cancellable = model.publisher(for: \.name)
     .sink { value in print(value) }
 ```
 
-`@objc dynamic` 프로퍼티에서만 동작. NSObject 상속 필수.
+Only works on `@objc dynamic` properties. Requires NSObject inheritance.
 
-### @Observable (iOS 17+) — 현대적 대체
+### @Observable (iOS 17+) — Modern Replacement
 
 ```swift
 @Observable
 class MyModel {
-    var name: String = ""  // @objc dynamic 불필요, @Published 불필요
+    var name: String = ""  // No @objc dynamic needed, no @Published needed
 }
 ```
 
-SwiftUI가 자동 추적. 비-SwiftUI에서는 `withObservationTracking` 사용.
+SwiftUI tracks automatically. Outside SwiftUI, use `withObservationTracking`.
 
-### 언제 어떤 것을 쓸까
+### When to Use Which
 
-| 패턴 | 용도 |
+| Pattern | Use |
 |------|------|
-| `@Observable` | 새 코드, SwiftUI (iOS 17+) |
-| KVO + Combine publisher | UIKit/AppKit 시스템 API 프로퍼티 관찰 |
-| Raw KVO | 레거시 코드, ObjC interop |
+| `@Observable` | New code, SwiftUI (iOS 17+) |
+| KVO + Combine publisher | Observing UIKit/AppKit system API properties |
+| Raw KVO | Legacy code, ObjC interop |
 
 ---
 
-## Codable 패턴
+## Codable Patterns
 
 ### JSONEncoder / JSONDecoder
 
@@ -205,12 +205,12 @@ encoder.keyEncodingStrategy = .convertToSnakeCase
 let decoder = JSONDecoder()
 decoder.dateDecodingStrategy = .iso8601
 decoder.keyDecodingStrategy = .convertFromSnakeCase
-decoder.allowsJSON5 = true  // JSON5 지원
+decoder.allowsJSON5 = true  // JSON5 support
 ```
 
 ### CodingKeyRepresentable (Swift 5.6+)
 
-non-String/Int 키 Dictionary가 배열 대신 객체로 인코딩:
+Encodes non-String/Int-keyed Dictionaries as objects instead of arrays:
 
 ```swift
 struct ID: Hashable, CodingKeyRepresentable {
@@ -218,10 +218,10 @@ struct ID: Hashable, CodingKeyRepresentable {
     var codingKey: CodingKey { ... }
     init?<T: CodingKey>(codingKey: T) { ... }
 }
-// [ID: String] → {"id1": "value1"} (배열이 아닌 객체)
+// [ID: String] → {"id1": "value1"} (object, not array)
 ```
 
-`RawRepresentable` enum (String/Int raw value)은 자동 적합.
+`RawRepresentable` enums (String/Int raw value) conform automatically.
 
 ---
 
@@ -229,23 +229,23 @@ struct ID: Hashable, CodingKeyRepresentable {
 
 ### iOS 17+ / macOS 14+
 
-`NSPredicate`의 Swift 네이티브 대체. 컴파일 타임 타입 체크.
+Swift-native replacement for `NSPredicate`. Compile-time type checking.
 
 ```swift
 let predicate = #Predicate<Message> { message in
     message.length < 100 && message.sender == "Jeremy"
 }
 
-// 중첩
+// Nested
 let complex = #Predicate<Message> { message in
     message.recipients.contains { $0.firstName == message.sender.firstName }
 }
 
-// 평가
+// Evaluate
 let result = try predicate.evaluate(someMessage)
 ```
 
-SwiftData `FetchDescriptor`에서 핵심적으로 사용:
+Used centrally in SwiftData's `FetchDescriptor`:
 
 ```swift
 let descriptor = FetchDescriptor<Dog>(
@@ -254,9 +254,9 @@ let descriptor = FetchDescriptor<Dog>(
 )
 ```
 
-지원 연산: 산술, 비교, 논리, optionals, 타입 캐스팅, 시퀀스(filter, contains, allSatisfy), 문자열(contains, localizedStandardContains).
+Supported operations: arithmetic, comparison, logic, optionals, type casting, sequences (filter, contains, allSatisfy), strings (contains, localizedStandardContains).
 
-Codable + Sendable — `PredicateCodableConfiguration`으로 아카이빙 가능.
+Codable + Sendable — can be archived with `PredicateCodableConfiguration`.
 
 ---
 
@@ -264,13 +264,13 @@ Codable + Sendable — `PredicateCodableConfiguration`으로 아카이빙 가능
 
 ### iOS 16+ / macOS 13+ / Swift 5.7
 
-3가지 생성 방식:
+Three ways to create one:
 
 ```swift
-// 1. 리터럴
+// 1. Literal
 let pattern = /(.+?): (.+)/
 
-// 2. 문자열 (런타임)
+// 2. String (runtime)
 let pattern = try Regex("[0-9]+")
 
 // 3. RegexBuilder DSL
@@ -284,9 +284,9 @@ let pattern = Regex {
 }
 ```
 
-### Foundation 통합
+### Foundation Integration
 
-FormatStyle을 regex 컴포넌트로 직접 사용 — 타입 안전 파싱:
+Use FormatStyle directly as a regex component — type-safe parsing:
 
 ```swift
 let regex = Regex {
@@ -296,7 +296,7 @@ let regex = Regex {
 }
 ```
 
-### String 매칭 메서드
+### String Matching Methods
 
 `contains(_:)`, `firstMatch(of:)`, `matches(of:)`, `prefixMatch(of:)`, `wholeMatch(of:)`
 
@@ -306,25 +306,25 @@ let regex = Regex {
 
 ### iOS 16+ / macOS 13+
 
-`DispatchTime`/`DispatchQueue.asyncAfter` 대체.
+Replaces `DispatchTime`/`DispatchQueue.asyncAfter`.
 
 ```swift
-// Duration — attosecond 정밀도
+// Duration — attosecond precision
 let d = Duration.seconds(5)
 let d2 = Duration.milliseconds(500)
-d.formatted()  // 로컬라이즈된 시:분:초
+d.formatted()  // Localized hours:minutes:seconds
 
-// 산술
+// Arithmetic
 let total = d + d2
 let doubled = d * 2
 ```
 
-### Clock 프로토콜
+### Clock Protocol
 
-| Clock | 특성 |
+| Clock | Characteristics |
 |-------|------|
-| `ContinuousClock` | 시스템 sleep 중에도 진행 (벽시계) |
-| `SuspendingClock` | sleep 시 일시정지 (실행 시간) |
+| `ContinuousClock` | Keeps advancing during system sleep (wall clock) |
+| `SuspendingClock` | Pauses during sleep (execution time) |
 
 ```swift
 let clock = ContinuousClock()
@@ -338,54 +338,54 @@ try await clock.sleep(for: .seconds(1))
 
 ## FileManager & Data
 
-### URL 기반 API 사용
+### Use URL-based APIs
 
-string path API 대신 URL 기반을 선호한다. Apple 공식: "The use of the NSURL class is generally preferred."
+Prefer URL-based APIs over string path APIs. Apple's official guidance: "The use of the NSURL class is generally preferred."
 
 ```swift
-// 선호
+// Preferred
 try fileManager.copyItem(at: sourceURL, to: destURL)
 try fileManager.createDirectory(at: dirURL, withIntermediateDirectories: true)
 
-// 비선호
+// Not preferred
 try fileManager.copyItem(atPath: sourcePath, toPath: destPath)
 ```
 
-### 안전한 저장
+### Safe Saving
 
-이동식/네트워크 볼륨에서는 `itemReplacementDirectory`로 atomic 저장.
+On removable/network volumes, use `itemReplacementDirectory` for atomic saves.
 
 ### Data
 
-파일 I/O는 동기적 (`Data(contentsOf:)`, `data.write(to:options:)`).
-`Sendable`, `Transferable` 적합.
+File I/O is synchronous (`Data(contentsOf:)`, `data.write(to:options:)`).
+Conforms to `Sendable`, `Transferable`.
 
 ---
 
 ## UserDefaults
 
-- 민감 데이터 저장 금지 (디스크에 암호화 없이 저장)
-- `register(defaults:)` — nil 체크 대신 fallback 값 등록
-- App Group 공유: `UserDefaults(suiteName: "group.com.example")`
-- `synchronize()` — deprecated/불필요. 자동 영속.
-- `NSUbiquitousKeyValueStore` — 크로스 디바이스 동기화용 (UserDefaults 아님)
-- `PrivacyInfo.xcprivacy`에 사용 선언 (핑거프린팅 우려)
+- Do not store sensitive data (stored unencrypted on disk)
+- `register(defaults:)` — register fallback values instead of nil checks
+- App Group sharing: `UserDefaults(suiteName: "group.com.example")`
+- `synchronize()` — deprecated/unnecessary. Persistence is automatic.
+- `NSUbiquitousKeyValueStore` — for cross-device sync (not UserDefaults)
+- Declare usage in `PrivacyInfo.xcprivacy` (fingerprinting concern)
 
 ---
 
-## Deprecated 패턴 대응표
+## Deprecated Pattern Mapping
 
-| 레거시 | 현대적 대체 | 시점 |
+| Legacy | Modern Replacement | Since |
 |--------|-----------|------|
 | `DateFormatter` | `Date.FormatStyle` / `.formatted()` | iOS 15 |
 | `NumberFormatter` | `IntegerFormatStyle` / `.formatted()` | iOS 15 |
-| `NSAttributedString` (직접 사용) | `AttributedString` (값 타입) | iOS 15 |
+| `NSAttributedString` (direct use) | `AttributedString` (value type) | iOS 15 |
 | `NSSortDescriptor` | `SortDescriptor` (generic, Codable) | iOS 15 |
-| `NSPredicate` (문자열 기반) | `#Predicate` 매크로 (타입 안전) | iOS 17 |
+| `NSPredicate` (string-based) | `#Predicate` macro (type-safe) | iOS 17 |
 | `NSRegularExpression` | `Regex` / `RegexBuilder` | iOS 16 |
 | URLSession completion handler | URLSession async/await | iOS 15 |
 | `NotificationCenter.addObserver` (selector) | `.notifications(named:)` async sequence | iOS 15 |
 | `DispatchTime` / `.asyncAfter` | `Duration` / `Clock.sleep(for:)` | iOS 16 |
-| FileManager string-path API | FileManager URL-based API | 오래전 |
-| `UserDefaults.synchronize()` | 호출 제거 (자동 영속) | 오래전 |
-| `swift-corelibs-foundation` (C 기반) | `swift-foundation` (순수 Swift, 통합) | Swift 6 |
+| FileManager string-path API | FileManager URL-based API | Long-standing |
+| `UserDefaults.synchronize()` | Remove the call (automatic persistence) | Long-standing |
+| `swift-corelibs-foundation` (C-based) | `swift-foundation` (pure Swift, unified) | Swift 6 |

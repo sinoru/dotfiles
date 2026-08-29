@@ -1,6 +1,6 @@
 # SwiftUI Reference
 
-버전별 신기능 연혁(Liquid Glass, WebView, @Animatable 등)은 `wwdc/` 년도 파일 참조.
+For per-version feature history (Liquid Glass, WebView, @Animatable, etc.), see the `wwdc/` year files.
 
 ## Table of Contents
 1. [State Management & Observation](#state-management--observation)
@@ -16,30 +16,30 @@
 
 ### @Observable (iOS 17+)
 
-`ObservableObject` + `@Published`를 대체하는 매크로. 프로퍼티별 추적으로 불필요한 뷰 업데이트를 방지한다.
+Macro that replaces `ObservableObject` + `@Published`. Per-property tracking prevents unnecessary view updates.
 
 ```swift
 @Observable
 class Library {
-    var books: [Book] = []       // 자동 추적, @Published 불필요
+    var books: [Book] = []       // Automatically tracked, no @Published needed
     var isLoading = false
-    @ObservationIgnored var cache: [String: Data] = [:]  // 추적 제외
+    @ObservationIgnored var cache: [String: Data] = [:]  // Excluded from tracking
 }
 ```
 
-핵심 차이: `ObservableObject`는 `@Published` 프로퍼티가 하나만 바뀌어도 모든 구독 뷰를 업데이트.
-`@Observable`은 `body`에서 실제 읽은 프로퍼티가 바뀔 때만 해당 뷰를 업데이트.
+Key difference: `ObservableObject` updates all subscribing views even if only one `@Published` property changes.
+`@Observable` updates a view only when a property it actually reads in `body` changes.
 
-### Property Wrapper 선택 (iOS 17+)
+### Property Wrapper Selection (iOS 17+)
 
-| Wrapper | 용도 |
+| Wrapper | Use |
 |---------|------|
-| `@State` | 뷰가 소유하는 데이터. 값 타입과 `@Observable` 클래스 모두 가능. `@StateObject` 대체. |
-| `@Binding` | 다른 곳의 state에 대한 양방향 참조. `$` 접두사로 생성. |
-| `@Bindable` | `@Observable` 객체에서 바인딩 생성 (`$property`). `@ObservedObject` 대체. |
-| `@Environment(Type.self)` | 환경에서 `@Observable` 객체 읽기. `@EnvironmentObject` 대체. |
-| `@Environment(\.keyPath)` | 환경 값 읽기. `@Entry` 매크로로 정의 가능. |
-| (wrapper 없음) | `@Observable` 객체를 plain property로 전달. 가장 일반적인 자식 뷰 패턴. |
+| `@State` | Data owned by the view. Works with both value types and `@Observable` classes. Replaces `@StateObject`. |
+| `@Binding` | Two-way reference to state owned elsewhere. Created with the `$` prefix. |
+| `@Bindable` | Creates bindings from an `@Observable` object (`$property`). Replaces `@ObservedObject`. |
+| `@Environment(Type.self)` | Reads an `@Observable` object from the environment. Replaces `@EnvironmentObject`. |
+| `@Environment(\.keyPath)` | Reads an environment value. Can be defined with the `@Entry` macro. |
+| (no wrapper) | Passes an `@Observable` object as a plain property. The most common pattern for child views. |
 
 ### Migration Map
 
@@ -48,15 +48,15 @@ class Library {
 | `class Foo: ObservableObject` | `@Observable class Foo` |
 | `@Published var x` | `var x` |
 | `@StateObject private var foo = Foo()` | `@State private var foo = Foo()` |
-| `@ObservedObject var foo: Foo` | `var foo: Foo` 또는 `@Bindable var foo: Foo` |
+| `@ObservedObject var foo: Foo` | `var foo: Foo` or `@Bindable var foo: Foo` |
 | `.environmentObject(foo)` | `.environment(foo)` |
 | `@EnvironmentObject var foo: Foo` | `@Environment(Foo.self) var foo` |
 
-두 시스템은 공존 가능. 점진적 마이그레이션 지원.
+Both systems can coexist. Supports incremental migration.
 
-### @Bindable 사용
+### @Bindable Usage
 
-바인딩이 필요할 때만 사용:
+Use only when a binding is needed:
 
 ```swift
 struct BookEditView: View {
@@ -67,7 +67,7 @@ struct BookEditView: View {
     }
 }
 
-// body 안에서 로컬로도 가능
+// Also usable locally inside body
 var body: some View {
     List(books) { book in
         @Bindable var book = book
@@ -76,12 +76,12 @@ var body: some View {
 }
 ```
 
-### @Entry 매크로 (iOS 18+, iOS 13까지 back-deploy)
+### @Entry Macro (iOS 18+, back-deployed to iOS 13)
 
-`EnvironmentKey` 보일러플레이트 제거:
+Removes `EnvironmentKey` boilerplate:
 
 ```swift
-// 기존
+// Before
 private struct MyKey: EnvironmentKey {
     static let defaultValue: String = "default"
 }
@@ -92,13 +92,13 @@ extension EnvironmentValues {
     }
 }
 
-// @Entry 사용
+// Using @Entry
 extension EnvironmentValues {
     @Entry var myValue: String = "default"
 }
 ```
 
-`EnvironmentValues`, `Transaction`, `ContainerValues`, `FocusedValues`에 사용 가능.
+Usable with `EnvironmentValues`, `Transaction`, `ContainerValues`, `FocusedValues`.
 
 ---
 
@@ -106,7 +106,7 @@ extension EnvironmentValues {
 
 ### NavigationStack (iOS 16+)
 
-`NavigationView`를 대체. 값 기반 프로그래매틱 네비게이션:
+Replaces `NavigationView`. Value-based programmatic navigation:
 
 ```swift
 @State private var path: [Park] = []
@@ -120,26 +120,26 @@ NavigationStack(path: $path) {
     }
 }
 
-// 프로그래매틱 제어
+// Programmatic control
 func showPark(_ park: Park) { path.append(park) }
 func popToRoot() { path.removeAll() }
 ```
 
 ### NavigationPath (iOS 16+)
 
-여러 타입을 담는 type-erased path:
+A type-erased path that can hold multiple types:
 
 ```swift
 @State private var path = NavigationPath()
 // path.append(somePark)  // Park
-// path.append(someAnimal)  // Animal — 다른 타입도 가능
+// path.append(someAnimal)  // Animal — other types work too
 ```
 
-`Codable` 값이면 `path.codable`로 상태 복원 가능.
+If the value is `Codable`, state restoration is possible via `path.codable`.
 
 ### NavigationSplitView (iOS 16+)
 
-멀티 컬럼 네비게이션 (iPad/Mac):
+Multi-column navigation (iPad/Mac):
 
 ```swift
 NavigationSplitView {
@@ -151,16 +151,16 @@ NavigationSplitView {
 }
 ```
 
-- 2열/3열 지원. compact에서 자동 스택으로 축소.
-- `NavigationSplitViewVisibility`로 컬럼 가시성 제어.
-- iPadOS 26: 리사이즈 가능 윈도우에서 자동 컬럼 show/hide.
+- Supports 2-column/3-column layouts. Collapses to an automatic stack in compact.
+- Control column visibility with `NavigationSplitViewVisibility`.
+- iPadOS 26: automatic column show/hide in resizable windows.
 
-### navigationDestination 변형
+### navigationDestination Variants
 
 ```swift
-.navigationDestination(for: Type.self) { value in ... }      // 값 기반
-.navigationDestination(isPresented: $bool) { ... }            // Bool 기반
-.navigationDestination(item: $optionalItem) { item in ... }   // Optional 바인딩
+.navigationDestination(for: Type.self) { value in ... }      // Value-based
+.navigationDestination(isPresented: $bool) { ... }            // Bool-based
+.navigationDestination(item: $optionalItem) { item in ... }   // Optional binding
 ```
 
 ---
@@ -169,7 +169,7 @@ NavigationSplitView {
 
 ### @Model (iOS 17+)
 
-`@Observable` 위에 구축된 영속 모델:
+A persistent model built on top of `@Observable`:
 
 ```swift
 @Model
@@ -188,7 +188,7 @@ class Trip {
 }
 ```
 
-### Container 설정
+### Container Setup
 
 ```swift
 @main
@@ -202,7 +202,7 @@ struct MyApp: App {
 
 ### @Query
 
-뷰에서 모델 데이터를 선언적으로 fetch + observe:
+Declaratively fetch + observe model data in a view:
 
 ```swift
 struct TripListView: View {
@@ -214,18 +214,18 @@ struct TripListView: View {
 }
 ```
 
-### ModelContext 조작
+### ModelContext Operations
 
 ```swift
 @Environment(\.modelContext) private var context
 
-context.insert(trip)       // 생성
-trip.name = "Updated"      // 수정 — 프로퍼티 직접 변경
-context.delete(trip)       // 삭제
-try context.save()         // 저장
+context.insert(trip)       // Create
+trip.name = "Updated"      // Update — modify the property directly
+context.delete(trip)       // Delete
+try context.save()         // Save
 ```
 
-### @ModelActor — 백그라운드 작업
+### @ModelActor — Background Work
 
 ```swift
 @ModelActor
@@ -243,37 +243,37 @@ actor DataHandler {
 
 ## Performance
 
-### @Observable 세분화
+### @Observable Granularity
 
-`@Observable`은 `body`에서 읽은 프로퍼티만 추적. `book.title`을 표시하는 뷰는 `book.author` 변경에 반응하지 않는다. 중간 뷰를 거쳐 전달해도 실제 읽는 뷰만 업데이트.
+`@Observable` tracks only the properties read in `body`. A view that displays `book.title` does not react to changes in `book.author`. Even when passed through intermediate views, only the view that actually reads the property is updated.
 
-### .task 수정자 (iOS 15+)
+### .task Modifier (iOS 15+)
 
-뷰 라이프사이클에 연결된 async 작업:
+Async work tied to the view lifecycle:
 
 ```swift
 .task { await loadData() }
 
-// id 변경 시 이전 task 취소 후 재실행
+// Cancels the previous task and reruns when id changes
 .task(id: selectedItem) {
     await loadDetails(for: selectedItem)
 }
 ```
 
-뷰가 사라지면 자동 취소.
+Automatically cancelled when the view disappears.
 
 ### Lazy Loading
 
-`LazyVStack` / `LazyHStack` — 화면에 보이는 뷰만 생성. iOS 26+에서 중첩 스크롤뷰에서도 정상 동작.
+`LazyVStack` / `LazyHStack` — creates only the views visible on screen. Works correctly even in nested scroll views on iOS 26+.
 
-### 스크롤 성능 (iOS 17+)
+### Scroll Performance (iOS 17+)
 
 ```swift
 .onScrollGeometryChange(of: \.contentOffset) { old, new in /* ... */ }
 .onScrollVisibilityChange(threshold: 0.5) { isVisible in /* ... */ }
 ```
 
-`GeometryReader` 없이 효율적인 스크롤 추적.
+Efficient scroll tracking without `GeometryReader`.
 
 ---
 
@@ -284,12 +284,12 @@ actor DataHandler {
 ```swift
 struct MyMapView: UIViewRepresentable {
     func makeUIView(context: Context) -> MKMapView { MKMapView() }
-    func updateUIView(_ uiView: MKMapView, context: Context) { /* SwiftUI 상태 반영 */ }
+    func updateUIView(_ uiView: MKMapView, context: Context) { /* Reflect SwiftUI state */ }
     func makeCoordinator() -> Coordinator { Coordinator() }
 }
 ```
 
-SwiftUI가 `center`, `bounds`, `frame`, `transform`을 소유 — 직접 수정 금지.
+SwiftUI owns `center`, `bounds`, `frame`, `transform` — do not modify directly.
 
 ### UIHostingController (iOS 13+)
 
@@ -302,7 +302,7 @@ hosting.didMove(toParent: self)
 
 ### UIHostingConfiguration (iOS 16+)
 
-UIKit 셀에 SwiftUI 직접 사용:
+Use SwiftUI directly in a UIKit cell:
 
 ```swift
 cell.contentConfiguration = UIHostingConfiguration {
@@ -310,10 +310,10 @@ cell.contentConfiguration = UIHostingConfiguration {
 }.margins(.all, 16)
 ```
 
-### 제스처 통합 (iOS 18+)
+### Gesture Integration (iOS 18+)
 
-`UIGestureRecognizerRepresentable` — UIKit 제스처를 SwiftUI에서 사용.
-크로스 프레임워크 제스처 의존성 설정 가능.
+`UIGestureRecognizerRepresentable` — use UIKit gestures in SwiftUI.
+Cross-framework gesture dependencies can be configured.
 
 ---
 
@@ -326,4 +326,4 @@ Text("Label")
     .glassEffect(.regular.tint(.blue).interactive())
 ```
 
-표준 네비게이션/툴바/탭바는 자동 적용. 커스텀 요소 그룹핑은 `GlassEffectContainer`.
+Standard navigation/toolbar/tab bars apply it automatically. Use `GlassEffectContainer` to group custom elements.

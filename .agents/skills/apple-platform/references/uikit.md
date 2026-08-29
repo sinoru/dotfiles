@@ -1,23 +1,23 @@
 # Modern UIKit Reference
 
-버전별 신기능 연혁은 `wwdc/` 년도 파일 참조.
+For per-version feature history, see the `wwdc/` year files.
 
 ## Table of Contents
-1. [Collection/Table View 모던 패턴](#collectiontable-view-모던-패턴)
-2. [뷰 컨트롤러 라이프사이클](#뷰-컨트롤러-라이프사이클)
-3. [Trait 시스템](#trait-시스템)
-4. [SwiftUI 통합](#swiftui-통합)
-5. [탭바 — UITab / UITabGroup](#탭바--uitab--uitabgroup-ios-18)
-6. [Observable 통합](#observable-통합-ios-26)
+1. [Collection/Table View Modern Patterns](#collectiontable-view-modern-patterns)
+2. [View Controller Lifecycle](#view-controller-lifecycle)
+3. [Trait System](#trait-system)
+4. [SwiftUI Integration](#swiftui-integration)
+5. [Tab Bar — UITab / UITabGroup](#tab-bar--uitab--uitabgroup-ios-18)
+6. [Observable Integration](#observable-integration-ios-26)
 7. [Liquid Glass](#liquid-glass-ios-26)
 
 ---
 
-## Collection/Table View 모던 패턴
+## Collection/Table View Modern Patterns
 
 ### CellRegistration (iOS 14+)
 
-`register` + `dequeueReusableCell(withReuseIdentifier:)` 대체:
+Replaces `register` + `dequeueReusableCell(withReuseIdentifier:)`:
 
 ```swift
 let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCell, Item> {
@@ -28,18 +28,18 @@ let cellRegistration = UICollectionView.CellRegistration<UICollectionViewListCel
     cell.contentConfiguration = content
 }
 
-// DiffableDataSource cell provider에서:
+// In the DiffableDataSource cell provider:
 collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item)
 ```
 
-CellRegistration을 cell provider 클로저 안에서 생성하지 말 것 — 재사용 실패/크래시.
+Do not create CellRegistration inside the cell provider closure — causes reuse failures/crashes.
 
 ### UIContentConfiguration (iOS 14+)
 
-`textLabel`/`detailTextLabel` 대체:
+Replaces `textLabel`/`detailTextLabel`:
 
-- `UIListContentConfiguration` — `.cell()`, `.subtitleCell()`, `.valueCell()`, `.sidebarCell()` 등
-- `UIContentUnavailableConfiguration` (iOS 17+) — 빈 상태: `.empty()`, `.loading()`, `.search()`
+- `UIListContentConfiguration` — `.cell()`, `.subtitleCell()`, `.valueCell()`, `.sidebarCell()`, etc.
+- `UIContentUnavailableConfiguration` (iOS 17+) — empty states: `.empty()`, `.loading()`, `.search()`
 
 ```swift
 override func updateContentUnavailableConfiguration(using state: UIContentUnavailableConfigurationState) {
@@ -61,23 +61,23 @@ snapshot.appendItems(items, toSection: .main)
 dataSource.apply(snapshot, animatingDifferences: true)
 ```
 
-- `SectionID`, `ItemID` 모두 `Hashable` + `Sendable`
-- `NSDiffableDataSourceSectionSnapshot` — 섹션 단위 계층적 데이터
-- 한번 설정한 data source는 바꾸지 않는다
+- `SectionID`, `ItemID` both `Hashable` + `Sendable`
+- `NSDiffableDataSourceSectionSnapshot` — hierarchical data per section
+- Do not swap out a data source once it's been set
 
 ### CompositionalLayout (iOS 13+)
 
-Item → Group → Section → Layout 계층:
+Item → Group → Section → Layout hierarchy:
 
 ```swift
 UICollectionViewCompositionalLayout.list(using: UICollectionLayoutListConfiguration(.insetGrouped))
 ```
 
-iOS 17: `NSCollectionLayoutDimension.uniformAcrossSiblings` — 형제 중 가장 큰 크기에 통일.
+iOS 17: `NSCollectionLayoutDimension.uniformAcrossSiblings` — unifies to the largest size among siblings.
 
 ### UIHostingConfiguration (iOS 16+)
 
-UIKit 셀에 SwiftUI 직접 사용:
+Use SwiftUI directly in a UIKit cell:
 
 ```swift
 cell.contentConfiguration = UIHostingConfiguration {
@@ -90,29 +90,29 @@ cell.contentConfiguration = UIHostingConfiguration {
 .background(.blue.gradient)
 ```
 
-`swipeActions`, separator alignment, 네이티브 셀 재활용 지원.
+Supports `swipeActions`, separator alignment, native cell reuse.
 
 ---
 
-## 뷰 컨트롤러 라이프사이클
+## View Controller Lifecycle
 
 ### viewIsAppearing (iOS 13+ back-deployed)
 
-appearance 전환당 1회 호출. `viewWillAppear` 이후, `viewDidAppear` 이전.
-뷰가 계층에 있고, traits/geometry가 정확. **geometry 의존 설정은 여기서.**
+Called once per appearance transition. After `viewWillAppear`, before `viewDidAppear`.
+The view is in the hierarchy, and traits/geometry are accurate. **Do geometry-dependent setup here.**
 
 ```
 viewWillAppear → viewIsAppearing → viewDidAppear
-                 ↑ 뷰 계층 O, traits 정확
+                 ↑ in view hierarchy, traits accurate
 ```
 
-- `viewWillAppear`: transition coordinator 접근, 균형 setup/teardown
-- `viewIsAppearing`: geometry 의존 설정 (가장 적합)
-- `viewDidAppear`: 애니메이션 완료 후 작업
+- `viewWillAppear`: transition coordinator access, balanced setup/teardown
+- `viewIsAppearing`: geometry-dependent setup (best fit)
+- `viewDidAppear`: work after animation completes
 
-### Scene 기반 라이프사이클 (iOS 13+, iOS 27 필수)
+### Scene-Based Lifecycle (iOS 13+, required in iOS 27)
 
-`UISceneDelegate` / `UIWindowSceneDelegate` 사용:
+Uses `UISceneDelegate` / `UIWindowSceneDelegate`:
 
 ```
 willConnectTo → willEnterForeground → didBecomeActive
@@ -120,12 +120,12 @@ willConnectTo → willEnterForeground → didBecomeActive
 didEnterBackground ← willResignActive
 ```
 
-iOS 26: `UIWindow(windowScene:)` 외 모든 init deprecated.
-iOS 27 SDK: scene lifecycle 미채택 앱은 **실행 자체가 실패** (구 SDK 빌드 바이너리는 계속 동작).
+iOS 26: every init other than `UIWindow(windowScene:)` is deprecated.
+iOS 27 SDK: apps that haven't adopted the scene lifecycle **fail to launch at all** (binaries built with older SDKs keep working).
 
 ---
 
-## Trait 시스템
+## Trait System
 
 ### Custom Traits (iOS 17+)
 
@@ -144,51 +144,51 @@ extension UIMutableTraits {
 }
 ```
 
-### 자동 Trait 추적 (iOS 18+)
+### Automatic Trait Tracking (iOS 18+)
 
-`layoutSubviews`, `drawRect` 등에서 접근한 trait이 변경되면 자동으로 뷰 무효화.
-수동 등록 불필요. `traitCollectionDidChange` override 대체.
+A trait accessed in `layoutSubviews`, `drawRect`, etc. automatically invalidates the view when it changes.
+No manual registration needed. Replaces the `traitCollectionDidChange` override.
 
-### Trait 브릿지 (iOS 17+)
+### Trait Bridging (iOS 17+)
 
-커스텀 UIKit trait ↔ SwiftUI environment key 양방향 브릿지 가능.
+Custom UIKit traits ↔ SwiftUI environment keys can be bridged bidirectionally.
 
 ---
 
-## SwiftUI 통합
+## SwiftUI Integration
 
 ### UIHostingController
 
 ```swift
 let hosting = UIHostingController(rootView: MySwiftUIView())
-// sizingOptions로 콘텐츠 크기 추적 가능
+// Content size tracking possible via sizingOptions
 ```
 
 ### UIViewRepresentable / UIViewControllerRepresentable
 
-SwiftUI에서 UIKit 래핑. `makeCoordinator()`로 delegate/target-action 브릿지.
-SwiftUI가 layout 속성 소유 — `frame`/`bounds`/`center`/`transform` 직접 수정 금지.
+Wraps UIKit in SwiftUI. Bridge delegate/target-action via `makeCoordinator()`.
+SwiftUI owns layout properties — do not modify `frame`/`bounds`/`center`/`transform` directly.
 
-### 제스처 통합 (iOS 18+)
+### Gesture Integration (iOS 18+)
 
-`UIGestureRecognizerRepresentable` — UIKit 제스처를 SwiftUI에서 사용.
-크로스 프레임워크 의존성, 속도 보존 지원.
+`UIGestureRecognizerRepresentable` — use UIKit gestures in SwiftUI.
+Supports cross-framework dependencies and velocity preservation.
 
-### 애니메이션 브릿지 (iOS 18+)
+### Animation Bridging (iOS 18+)
 
-SwiftUI `Animation` 타입으로 UIKit 뷰 애니메이션:
+Animate UIKit views with the SwiftUI `Animation` type:
 
 ```swift
 UIView.animate(springDuration: 0.5) {
-    // UIKit 뷰 변경, SwiftUI 스프링 타이밍 적용
+    // UIKit view changes, SwiftUI spring timing applied
 }
 ```
 
 ---
 
-## 탭바 — UITab / UITabGroup (iOS 18+)
+## Tab Bar — UITab / UITabGroup (iOS 18+)
 
-탭바 + 사이드바 결합 경험 (iPadOS 플로팅 탭바):
+A combined tab bar + sidebar experience (iPadOS floating tab bar):
 
 ```swift
 let tab = UITab(title: "Home", image: UIImage(systemName: "house")) { _ in
@@ -196,34 +196,34 @@ let tab = UITab(title: "Home", image: UIImage(systemName: "house")) { _ in
 }
 ```
 
-드래그 앤 드롭 커스터마이제이션 지원.
+Supports drag-and-drop customization.
 
 ---
 
-## Observable 통합 (iOS 26+)
+## Observable Integration (iOS 26+)
 
-`layoutSubviews`, cell configuration handler에서 `@Observable` 자동 추적 — 읽은 프로퍼티가 바뀌면 자동 무효화.
-`updateProperties()` — layout 전에 실행되는 프로퍼티 갱신 전용 라이프사이클 메서드.
+`@Observable` is automatically tracked in `layoutSubviews` and cell configuration handlers — automatically invalidates when a read property changes.
+`updateProperties()` — a lifecycle method dedicated to property updates that runs before layout.
 
 ---
 
 ## Liquid Glass (iOS 26+)
 
-### 자동 적용
+### Automatic Application
 
-Xcode 26 SDK로 빌드하면 표준 UIKit 컨트롤이 자동으로 Liquid Glass 스타일 적용.
-탭바 투명화, 네비게이션바 투명 기본값.
+Building with the Xcode 26 SDK automatically applies the Liquid Glass style to standard UIKit controls.
+Tab bar becomes transparent; navigation bar transparency is the default.
 
 ### UIGlassEffect / UIGlassContainerEffect
 
 ```swift
 let glassEffect = UIGlassEffect()
-// UIGlassContainerEffect로 여러 glass 요소 그룹핑
+// Group multiple glass elements with UIGlassContainerEffect
 ```
 
-### 버튼
+### Buttons
 
 ```swift
 var config = UIButton.Configuration.glass()
-// 또는 .prominentGlass()
+// Or .prominentGlass()
 ```

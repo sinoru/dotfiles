@@ -1,87 +1,87 @@
 # Human Interface Guidelines Reference
 
 ## Table of Contents
-1. [핵심 원칙](#핵심-원칙)
-2. [플랫폼별 디자인 특성](#플랫폼별-디자인-특성)
-3. [네비게이션 패턴](#네비게이션-패턴)
-4. [타이포그래피](#타이포그래피)
-5. [컬러](#컬러)
-6. [레이아웃 & 간격](#레이아웃--간격)
-7. [접근성](#접근성)
+1. [Core Principles](#core-principles)
+2. [Platform-Specific Design Characteristics](#platform-specific-design-characteristics)
+3. [Navigation Patterns](#navigation-patterns)
+4. [Typography](#typography)
+5. [Color](#color)
+6. [Layout & Spacing](#layout--spacing)
+7. [Accessibility](#accessibility)
 8. [Material & Liquid Glass](#material--liquid-glass)
-9. [주요 컴포넌트 가이드라인](#주요-컴포넌트-가이드라인)
+9. [Key Component Guidelines](#key-component-guidelines)
 
 ---
 
-## 핵심 원칙
+## Core Principles
 
-- **Clarity**: 텍스트 가독성, 아이콘 명확성, 기능에 집중
-- **Deference**: 유동적 모션과 깔끔한 인터페이스로 콘텐츠가 UI와 경쟁하지 않게
-- **Depth**: 시각적 계층과 사실적 모션으로 계층 전달
+- **Clarity**: Focus on text legibility, icon clarity, and function
+- **Deference**: Fluid motion and a clean interface so content doesn't compete with the UI
+- **Depth**: Convey hierarchy through visual layers and realistic motion
 
 ---
 
-## 플랫폼별 디자인 특성
+## Platform-Specific Design Characteristics
 
 ### iOS
-- 중간 크기 고해상도 디스플레이, 30-60cm 거리
-- 콘텐츠 중심, 화면 컨트롤 최소화
-- 엄지 닿는 중간/하단 영역에 컨트롤 배치
-- portrait + landscape 지원, Dynamic Type, Dark Mode
+- Medium-sized high-resolution display, viewed from 30-60cm
+- Content-focused, minimize on-screen controls
+- Place controls within thumb reach, in the middle/bottom area
+- Support portrait + landscape, Dynamic Type, Dark Mode
 
 ### macOS
-- 대형 디스플레이, 30-90cm 거리, 착석
-- 더 많은 콘텐츠를 적은 중첩으로, 적은 모달리티
-- 메뉴바 + 키보드 단축키 필수
-- 높은 정밀도 입력, 커스터마이즈 가능한 윈도우/툴바
+- Large display, viewed from 30-90cm, while seated
+- More content with less nesting, fewer modalities
+- Menu bar + keyboard shortcuts are essential
+- High-precision input, customizable windows/toolbars
 
 ### watchOS
-- 소형 디스플레이, 손목, 30cm 이내
-- 1분 이내 간결한 인터랙션
-- Digital Crown 기본 네비게이션
-- Always On Display, complications이 앱보다 더 많이 사용될 수 있음
+- Small display, on the wrist, within 30cm
+- Brief interactions under 1 minute
+- Digital Crown as the default navigation
+- Always On Display; complications may be used more than the app itself
 
 ### tvOS
-- 대형 디스플레이, 2.4m+ 거리
-- 포커스 시스템으로 방향 탐색
-- 가장자리 채우는 아트워크, 유동적 애니메이션
-- 장시간 세션, PiP 지원
+- Large display, viewed from 2.4m+
+- Directional navigation via the focus system
+- Edge-to-edge artwork, fluid animation
+- Long sessions, PiP support
 
 ### visionOS
-- 무한 캔버스: 윈도우, 볼륨, 3D 오브젝트
-- 시선 + 핀치 입력, 직접 터치
-- 콘텐츠를 사용자에게 가져오기 (이동 강요 금지)
-- glass material, depth로 계층 표현
+- Infinite canvas: windows, volumes, 3D objects
+- Gaze + pinch input, direct touch
+- Bring content to the user (never force them to move)
+- Express hierarchy with glass material and depth
 
 ---
 
-## 네비게이션 패턴
+## Navigation Patterns
 
 ### Tab Bar
-- 최상위 섹션 네비게이션 (액션 아님 — 액션은 툴바)
-- 탭 수 최소화, "More" 탭 피하기
-- 아이콘 아래/옆에 레이블, 채워진 SF Symbols
-- 탭 버튼 비활성화/숨기기 금지 — 콘텐츠 불가 이유 설명
-- visionOS: 항상 수직, 심볼 + 짧은 텍스트 필수
+- Top-level section navigation (not actions — actions belong in the toolbar)
+- Minimize the number of tabs, avoid a "More" tab
+- Labels below/beside icons, filled SF Symbols
+- Don't disable/hide tab buttons — explain why content is unavailable
+- visionOS: Always vertical, symbol + short text required
 
 ### Sidebar
-- 뷰 왼쪽, 플랫 계층 표시
-- iOS에서는 피하기 (공간 과다 소비)
-- iPadOS: `sidebarAdaptable` 스타일로 탭바 전환 가능
-- 계층 2단계 이내
+- Left side of the view, shows a flat hierarchy
+- Avoid on iOS (consumes too much space)
+- iPadOS: Can switch to a tab bar with the `sidebarAdaptable` style
+- Keep hierarchy within 2 levels
 
 ### Split View
-- 복수 인접 패널
-- 현재 선택 영속적으로 하이라이트
-- 패널 간 드래그 앤 드롭
+- Multiple adjacent panels
+- Persistently highlight the current selection
+- Drag and drop between panels
 
 ---
 
-## 타이포그래피
+## Typography
 
-### 기본/최소 폰트 크기
+### Default/Minimum Font Sizes
 
-| 플랫폼 | 기본 | 최소 |
+| Platform | Default | Minimum |
 |--------|------|------|
 | iOS/iPadOS | 17pt | 11pt |
 | macOS | 13pt | 10pt |
@@ -89,98 +89,98 @@
 | visionOS | 17pt | 12pt |
 | watchOS | 16pt | 12pt |
 
-### 시스템 폰트
+### System Fonts
 
-- **SF Pro** — iOS, iPadOS, macOS, tvOS, visionOS 기본
+- **SF Pro** — default for iOS, iPadOS, macOS, tvOS, visionOS
 - **SF Compact** — watchOS
-- **SF Mono** — 고정폭
-- **New York** — serif, SF와 함께 또는 단독 사용
+- **SF Mono** — fixed-width
+- **New York** — serif, used alongside SF or on its own
 
-### 가중치
+### Weights
 
-Regular, Medium, Semibold, Bold 선호. Ultralight, Thin, Light는 가독성 문제.
+Prefer Regular, Medium, Semibold, Bold. Ultralight, Thin, and Light have legibility issues.
 
 ### Dynamic Type
 
-iOS, iPadOS, visionOS, watchOS 지원. tvOS는 tvOS 27부터 지원 (macOS 미지원).
-모든 크기에서 레이아웃 적응 필수. 큰 크기에서 truncation 최소화. 접근성 크기에서 stacked 레이아웃 고려.
+Supported on iOS, iPadOS, visionOS, watchOS. tvOS supports it starting with tvOS 27 (not supported on macOS).
+Layout must adapt at all sizes. Minimize truncation at large sizes. Consider a stacked layout at accessibility sizes.
 
 ---
 
-## 컬러
+## Color
 
-### Semantic 색상 사용
+### Use Semantic Colors
 
-하드코딩 대신 시스템 색상 API:
+System color APIs instead of hardcoding:
 
-**배경 (iOS)**:
+**Background (iOS)**:
 - `systemBackground`, `secondarySystemBackground`, `tertiarySystemBackground`
 - `systemGroupedBackground`, `secondarySystemGroupedBackground`, `tertiarySystemGroupedBackground`
 
-**전경**:
+**Foreground**:
 - `label`, `secondaryLabel`, `tertiaryLabel`, `quaternaryLabel`
 - `placeholderText`, `separator`, `link`
 
-### 색상 공간
+### Color Space
 
-sRGB 표준. Display P3는 호환 디스플레이에서. P3는 16bit/channel. 에셋 카탈로그에서 색상 공간별 변형 제공.
+sRGB is the standard. Display P3 on compatible displays. P3 is 16bit/channel. Asset catalogs provide per-color-space variants.
 
-### 포용적 디자인
+### Inclusive Design
 
-- 색상에만 의존하지 않기 — 레이블/모양으로 보충
-- 문화적 색상 의미 고려 (빨강 = 서양 위험, 중국 문화 긍정)
+- Don't rely on color alone — supplement with labels/shapes
+- Consider cultural color meanings (red = danger in Western culture, positive in Chinese culture)
 
-### Liquid Glass 색상
+### Liquid Glass Color
 
-콘텐츠 뒤의 색상을 반영. glass material에 색상을 절제하여 적용. 강조 요소에만 colored background.
+Reflects the color behind the content. Apply color to glass material sparingly. Use colored backgrounds only for emphasis elements.
 
 ---
 
-## 레이아웃 & 간격
+## Layout & Spacing
 
 ### Safe Area
 
-시스템 컴포넌트(툴바, 탭바, Dynamic Island 등)에 가려지지 않는 영역.
-- tvOS: 모든 가장자리에서 60pt 안쪽
-- watchOS: 베젤이 자연 패딩 제공
+The area not obscured by system components (toolbar, tab bar, Dynamic Island, etc.).
+- tvOS: 60pt inset from every edge
+- watchOS: The bezel provides natural padding
 
 ### Size Class
 
-| 기기 | portrait | landscape |
+| Device | portrait | landscape |
 |------|----------|-----------|
-| iPad 전체 | Regular × Regular | Regular × Regular |
+| iPad (all) | Regular × Regular | Regular × Regular |
 | iPhone (portrait) | Compact × Regular | — |
-| iPhone (landscape) | 모델별 상이 | — |
+| iPhone (landscape) | Varies by model | — |
 
-compact 레이아웃 전환을 최대한 늦추기.
+Delay switching to a compact layout as long as possible.
 
-### 주요 기기 크기 (portrait, pt)
+### Key Device Sizes (portrait, pt)
 
 - iPad Pro 12.9": 1024×1366
 - iPhone 16 Pro Max: 440×956
 - iPhone 16: 393×852
 - iPhone SE: 320×568
 
-### watchOS 컨트롤
+### watchOS Controls
 
-한 행에 최대 2-3개 (글리프 3개 또는 텍스트 2개). full-width 선호.
+Max 2-3 per row (3 glyphs or 2 text items). Prefer full-width.
 
 ### visionOS
 
-인터랙티브 요소 중심 간격 최소 **60pt**.
+Minimum center-to-center spacing of **60pt** for interactive elements.
 
 ---
 
-## 접근성
+## Accessibility
 
-### 색상 대비 (WCAG AA)
+### Color Contrast (WCAG AA)
 
-- 17pt 이하 텍스트: **4.5:1** 최소
-- 18pt+ 또는 볼드: **3:1** 최소
+- Text 17pt and under: **4.5:1** minimum
+- 18pt+ or bold: **3:1** minimum
 
-### 최소 터치 타겟
+### Minimum Touch Target
 
-| 플랫폼 | 기본 | 최소 |
+| Platform | Default | Minimum |
 |--------|------|------|
 | iOS/iPadOS | 44×44pt | 28×28pt |
 | macOS | 28×28pt | 20×20pt |
@@ -188,32 +188,32 @@ compact 레이아웃 전환을 최대한 늦추기.
 | visionOS | 60×60pt | 28×28pt |
 | watchOS | 44×44pt | 28×28pt |
 
-### 간격
+### Spacing
 
-베젤 요소 주변 ~12pt, 비베젤 요소 주변 ~24pt
+~12pt around bezel elements, ~24pt around non-bezel elements
 
-### 텍스트 확대
+### Text Scaling
 
-최소 200% 확대 지원 (watchOS: 140%)
+Support at least 200% scaling (watchOS: 140%)
 
 ### Reduce Motion
 
-활성화 시: 자동 애니메이션 축소, 스프링 타이트닝, 전환을 페이드로 대체, depth 축 애니메이션 회피
+When enabled: reduce automatic animations, tighten springs, replace transitions with fades, avoid depth-axis animation
 
-### 단순 제스처
+### Simple Gestures
 
-일반 인터랙션에 단순 제스처 사용. 항상 대안 제공 (스와이프 + 화면 버튼).
+Use simple gestures for common interactions. Always provide an alternative (swipe + on-screen button).
 
 ### VoiceOver
 
-모든 요소에 접근성 레이블. 커스텀 컨트롤에 적절한 trait 설정.
+Accessibility labels on every element. Set appropriate traits on custom controls.
 
-### visionOS 접근성
+### visionOS Accessibility
 
-- Dwell Control: 핸즈프리 시선 고정 선택
-- 요소를 시야각 내 배치
-- 가로 레이아웃 선호
-- 빠른 움직임/강도 제한
+- Dwell Control: hands-free selection by fixing gaze
+- Place elements within the field of view
+- Prefer horizontal layouts
+- Limit fast movement/intensity
 
 ---
 
@@ -221,60 +221,60 @@ compact 레이아웃 전환을 최대한 늦추기.
 
 ### Liquid Glass (iOS 26+, macOS Tahoe+)
 
-실제 유리처럼 동작하는 반투명 dynamic material.
+A translucent dynamic material that behaves like real glass.
 
-- **Regular**: 블러, 광도 조정
-- **Clear**: 높은 투과성
-- 가장 작은 요소(버튼, 스위치)부터 큰 요소(탭바, 사이드바)까지 확장
-- 크로스 플랫폼: iOS, iPadOS, macOS, watchOS, tvOS
+- **Regular**: blur, luminosity adjustment
+- **Clear**: high transparency
+- Scales from the smallest elements (buttons, switches) to large ones (tab bars, sidebars)
+- Cross-platform: iOS, iPadOS, macOS, watchOS, tvOS
 
-### 앱 아이콘 (Liquid Glass)
+### App Icons (Liquid Glass)
 
-레이어 디자인 + Liquid Glass 효과 (specular highlight, frosting, 반투명).
-6가지 자동 변형: default, dark, clear light, clear dark, tinted light, tinted dark.
-Xcode Icon Composer 도구로 제작.
+Layered design + Liquid Glass effects (specular highlight, frosting, translucency).
+6 automatic variants: default, dark, clear light, clear dark, tinted light, tinted dark.
+Created with the Xcode Icon Composer tool.
 
 ### Standard Materials (iOS)
 
-Ultra Thin, Thin, Regular, Thick — 배경 블러 레벨.
+Ultra Thin, Thin, Regular, Thick — background blur levels.
 
 ### Vibrancy
 
-Labels (4레벨), Fills (3레벨), Separators (1레벨).
+Labels (4 levels), Fills (3 levels), Separators (1 level).
 
 ### visionOS Glass
 
-수정 불가, 광도에 자동 적응. 별도 Dark Mode 없음.
+Not customizable, automatically adapts to luminosity. No separate Dark Mode.
 
 ---
 
-## 주요 컴포넌트 가이드라인
+## Key Component Guidelines
 
 ### Button
-- 최소 hit 영역 44×44pt (visionOS 60×60pt)
-- Prominent 스타일: 뷰당 1-2개 최대
-- 4가지 역할: Normal, Primary (accent), Cancel, Destructive (빨강)
-- 파괴적 액션에 Primary 역할 할당 금지
-- visionOS: 아이콘=원형, 텍스트=캡슐, 중심 간격 60pt+
+- Minimum hit area 44×44pt (visionOS 60×60pt)
+- Prominent style: max 1-2 per view
+- 4 roles: Normal, Primary (accent), Cancel, Destructive (red)
+- Never assign the Primary role to a destructive action
+- visionOS: icon = circular, text = capsule, center spacing 60pt+
 
 ### Sheet
-- 현재 컨텍스트의 범위 작업
-- Cancel (좌), Done (우), Back (계층 네비게이션)
-- iOS: detents (large=전체, medium=절반), grabber
-- 복잡한/장기 워크플로우나 미디어 콘텐츠에 사용 금지
+- A task scoped to the current context
+- Cancel (left), Done (right), Back (hierarchical navigation)
+- iOS: detents (large=full, medium=half), grabber
+- Don't use for complex/long workflows or media content
 
 ### Alert
-- 즉각 주의가 필요한 중요 정보에만 사용 — 남용 금지
-- 최대 3개 버튼
-- 파괴적 스타일링: 사용자가 시작하지 않은 파괴적 액션에만
-- 가장 가능한 선택 trailing, Cancel leading
+- Use only for important information requiring immediate attention — don't overuse
+- Max 3 buttons
+- Destructive styling: only for destructive actions not initiated by the user
+- Most likely choice trailing, Cancel leading
 
 ### List
-- iOS: grouped 스타일 + header/footer
-- macOS: 멀티 컬럼, 정렬, 리사이즈, 교차 행 색상
-- 텍스트 표시 우선, 항목 간결하게
+- iOS: grouped style + header/footer
+- macOS: multi-column, sorting, resizing, alternating row colors
+- Prioritize text display, keep items concise
 
 ### Progress Indicator
-- 기간 알 때: determinate (프로그레스 바 / 원형)
-- 기간 모를 때: indeterminate (회전)
-- 가능하면 determinate 선호
+- When duration is known: determinate (progress bar / circular)
+- When duration is unknown: indeterminate (spinning)
+- Prefer determinate when possible
