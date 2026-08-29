@@ -78,16 +78,30 @@ No heap allocation. Ideal for embedded, performance-critical, or fixed-size buff
 
 Safe contiguous memory views — the safe replacement for `UnsafeBufferPointer`. Non-escapable (`~Escapable`) — compiler prevents dangling references.
 
-### Yielding Accessors — SE-0474
+---
 
-Copy-free access to stored values:
+## API Evolution
+
+### @nonexhaustive Enum — SE-0487 (6.2.3)
+
+Mark a public enum as extensible in non-resilient libraries (shipped in the 6.2.3 patch release):
 
 ```swift
-var name: String {
-    yielding borrow { yield _storage.name }
-    yielding mutate { yield &_storage.name }
+@nonexhaustive
+public enum ConnectionState {
+    case connecting, connected, disconnected
+}
+
+// External code must handle unknown future cases:
+switch state {
+case .connecting: ...
+case .connected: ...
+case .disconnected: ...
+@unknown default: ...
 }
 ```
+
+Use `@nonexhaustive(warn)` for gradual adoption — external exhaustive switches get a warning instead of an error.
 
 ---
 
@@ -121,7 +135,7 @@ Backtick-delimited identifiers allow any characters. Useful for descriptive test
 
 ## Standard Library & Frameworks
 
-- **`Subprocess`** package: Concurrency-friendly external process management
+- **`Subprocess`** package: Concurrency-friendly external process management (preview at 6.2 release; now source-stable at 1.0)
 - **Foundation NotificationCenter**: Type-safe API replacing string-based notifications
 - **Observation**: `Observations` async sequence with transactional batching
 
@@ -142,6 +156,4 @@ Backtick-delimited identifiers allow any characters. Useful for descriptive test
 - **WebAssembly**: Full support for browser and server
 - **Embedded Swift**: Complete String API, `any` types, InlineArray, Span
 
-## Breaking Changes
-
-- `nonisolated async` default execution context changed (SE-0461): background execution now requires explicit `@concurrent`
+Breaking changes by version: see `references/swift-migration.md`.

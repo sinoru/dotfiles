@@ -112,27 +112,7 @@ swift package init --type macro       # macro (includes swift-syntax)
 
 ### Version Requirements
 
-```swift
-dependencies: [
-    // Up to the next major version (most common)
-    .package(url: "https://github.com/org/repo.git", from: "2.0.0"),
-
-    // Exact version
-    .package(url: "https://github.com/org/repo.git", exact: "2.1.3"),
-
-    // Up to the next minor version
-    .package(url: "https://github.com/org/repo.git", .upToNextMinor(from: "2.1.0")),
-
-    // Range
-    .package(url: "https://github.com/org/repo.git", "2.0.0"..<"3.0.0"),
-
-    // Branch (development/testing)
-    .package(url: "https://github.com/org/repo.git", branch: "develop"),
-
-    // Specific commit (debugging)
-    .package(url: "https://github.com/org/repo.git", revision: "abc123"),
-]
-```
+`from: "2.0.0"` (up to next major — the default choice), `exact:`, `.upToNextMinor(from:)`, a range (`"2.0.0"..<"3.0.0"`), `branch:`, or `revision:`. Branch/revision dependencies are for development only — release tags must use versions.
 
 Git tags must be three-component semver (major.minor.patch). Two-component tags are ignored.
 

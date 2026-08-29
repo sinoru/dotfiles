@@ -49,7 +49,7 @@ Swift extensions can replace Objective-C `@implementation` blocks, enabling cate
 
 ### Trailing Comma Expansion
 
-Trailing commas now allowed in tuples, parameter/argument lists, generic parameters, closure capture lists, and string interpolations — not just collection literals.
+Trailing commas now allowed in tuples, parameter/argument lists, generic parameters, closure capture lists, and string interpolations — not just collection literals. Note: code with these trailing commas does not compile on pre-6.1 toolchains — mind your minimum supported version.
 
 ### Member Import Visibility — SE-0444
 
@@ -67,6 +67,4 @@ Upcoming feature `MemberImportVisibility` requires direct imports for all used m
 - **SwiftPM Package Traits**: Environment-specific API via `.trait(name:)`
 - **Background Indexing**: SourceKit-LSP default for SwiftPM projects
 
-## Breaking Changes
-
-- `any` enforcement (SE-0335 / `ExistentialAny`) downgraded from error to warning. Re-escalate with `-Werror ExistentialAny`.
+Breaking changes by version: see `references/swift-migration.md`.

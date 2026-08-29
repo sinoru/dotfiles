@@ -20,7 +20,7 @@ description: >-
 
 # Swift Language Guide
 
-Guidance for Swift development grounded in the [Swift API Design Guidelines](https://www.swift.org/documentation/api-design-guidelines/) and updated for Swift 6.3. One skill covers the language, the package ecosystem (SwiftPM, official packages), and server-side Swift (Vapor, Fluent, SwiftNIO — see `references/server/`).
+Guidance for Swift development grounded in the [Swift API Design Guidelines](https://www.swift.org/documentation/api-design-guidelines/) and updated for Swift 6.3 (latest stable; 6.4 is in development — see `references/swift-6_4.md`). One skill covers the language, the package ecosystem (SwiftPM, official packages), and server-side Swift (Vapor, Fluent, SwiftNIO — see `references/server/`).
 
 ## Core Principles
 
@@ -47,7 +47,7 @@ Guidance for Swift development grounded in the [Swift API Design Guidelines](htt
 - **K&R braces** — opening `{` on same line, `} else {` together
 - **No parentheses** around conditions: `if condition {`
 - **No semicolons**
-- **Trailing commas required** in multi-line lists (collections, parameters, generics, captures)
+- **Trailing commas required** in multi-line lists — collections always; parameters/generics/captures only on Swift 6.1+ toolchains
 - **One primary type per file**, filename matches the type
 
 ### Safety Essentials
@@ -67,13 +67,14 @@ These are the most impactful modern Swift patterns. Read the version-specific re
 - Use **module-level `defaultIsolation`** (6.2+) instead of annotating every type with `@MainActor`
 - `nonisolated async` functions now **stay on the caller's executor** (6.2+) — use **`@concurrent`** when you actually need parallel execution
 - Prefer **`nonisolated`** on types/extensions (6.1+) to opt out of inherited actor isolation cleanly
-- **`async defer`** (6.3+) — `defer` blocks can now `await`
+- **`async defer`** is **Swift 6.4 (unreleased)** — do not use or suggest it on stable toolchains
 
 **Type System:**
 
 - **Typed throws** `throws(MyError)` (6.0+) for precise error contracts
 - **`InlineArray`** / `[N of Element]` (6.2+) for fixed-size stack-allocated buffers
-- **`@nonexhaustive` enum** (6.3+) for library enums that may grow cases
+- **`@nonexhaustive` enum** (6.2.3+) for library enums that may grow cases
+- **`weak let`** (6.3+) — immutable weak references; unblocks `Sendable` classes with weak stored properties
 
 **Interop & Modules:**
 
@@ -110,8 +111,9 @@ Read the file matching the target Swift version. Each file instructs to also rea
 
 - **`references/swift-6_0.md`** — Data race safety, typed throws, noncopyable types, import access control
 - **`references/swift-6_1.md`** — `nonisolated` on types, TaskGroup inference, trailing comma expansion
-- **`references/swift-6_2.md`** — Default MainActor, `@concurrent`, InlineArray, Span, strict memory safety
-- **`references/swift-6_3.md`** — `@c` interop, module selectors `::`, `@nonexhaustive` enum, async defer
+- **`references/swift-6_2.md`** — Default MainActor, `@concurrent`, InlineArray, Span, `@nonexhaustive` (6.2.3), strict memory safety
+- **`references/swift-6_3.md`** — `@c` interop, module selectors `::`, `weak let`, `@specialized`, `@inline(always)`, `@export`
+- **`references/swift-6_4.md`** — **Unreleased preview** (async defer, borrow/mutate accessors, `~Sendable`, `@diagnose`). Read to know what's coming — not for code targeting stable toolchains.
 
 ### `references/swift-migration.md` — Migration & Best Practices
 
@@ -130,8 +132,8 @@ When to read: writing Package.swift, managing dependencies (version requirements
 Server-side Swift used to be a separate skill; it lives here now so that one skill covers all Swift work. Reach for this directory when `Package.swift` depends on vapor, fluent, swift-nio, or SSWG packages, when code imports `Vapor`, `Fluent`, `NIO*`, or `AsyncHTTPClient`, or when the discussion is about server architecture (routing, middleware, ORM, deployment).
 
 - **`references/server/overview.md`** — Start here for any Vapor/NIO project: Package.swift template and folder layout, core architectural principles (never block an EventLoop, async/await over EventLoopFuture, request lifecycle, content negotiation), EventLoop ↔ async/await bridging, Vapor-specific Swift 6 migration notes, critical gotchas table, package version table.
-- **`references/server/vapor.md`** — Routing, controllers, middleware, Fluent ORM & migrations, authentication, HTTP client, WebSocket, sessions, validation, content system, environment, error handling, server configuration, testing, Docker deployment. Read when writing or modifying Vapor application code.
-- **`references/server/vapor-extras.md`** — Queues (job system), JWT, APNS, Leaf templating, Redis, custom commands, Files API, Services/DI, distributed tracing middleware. Read when integrating these Vapor add-on packages.
+- **`references/server/vapor.md`** — Routing, controllers, middleware (incl. TracingMiddleware), Fluent ORM & migrations, authentication, HTTP client, WebSocket, sessions, validation, content system, environment, error handling, server configuration, testing, Files API (streaming), Docker deployment. Read when writing or modifying Vapor application code.
+- **`references/server/vapor-extras.md`** — Queues (job system), JWT, APNS, Leaf templating, Redis, custom commands, Services/DI. Read when integrating these Vapor add-on packages.
 - **`references/server/swiftnio.md`** — EventLoop, Channel, ChannelHandler, ChannelPipeline, Bootstrap, ByteBuffer, NIOAsyncChannel, Swift Concurrency bridging. Read when working at the NIO layer or debugging concurrency/performance issues.
 - **`references/server/ecosystem.md`** — swift-log, swift-metrics, swift-distributed-tracing, swift-service-lifecycle, AsyncHTTPClient, gRPC Swift 2, Swift OpenAPI Generator. Read when integrating observability, service lifecycle, or these libraries — CLI tools and daemons use them as much as servers do, so read it even when no web framework is involved.
 

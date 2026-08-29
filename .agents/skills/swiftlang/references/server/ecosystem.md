@@ -2,6 +2,8 @@
 
 Reference for the broader Swift server ecosystem libraries. Read this when integrating observability, managing service lifecycle, making HTTP requests, or using gRPC / OpenAPI.
 
+Version numbers and `from:` pins for these packages live in **`overview.md` → Version Reference** (the single source of truth) — they are deliberately not repeated per-package here.
+
 ## Table of Contents
 
 1. [swift-log](#swift-log)
@@ -18,23 +20,7 @@ Reference for the broader Swift server ecosystem libraries. Read this when integ
 
 Unified logging API for the Swift server ecosystem. Provides `Logger` type with pluggable backends.
 
-**Dependency**: `from: "1.6.0"` (current: 1.11.x)
-
-### Usage
-
-```swift
-import Logging
-
-let logger = Logger(label: "com.example.MyApp")
-
-logger.info("Server started", metadata: ["port": "\(port)"])
-logger.error("Request failed", metadata: ["error": "\(error)"])
-logger.debug("Processing request", metadata: ["request-id": "\(requestID)"])
-```
-
-### Log Levels
-
-`trace` < `debug` < `info` < `notice` < `warning` < `error` < `critical`
+Log levels: `trace` < `debug` < `info` < `notice` < `warning` < `error` < `critical`
 
 ### Structured Metadata
 
@@ -59,8 +45,6 @@ logger.info("Processing")  // includes request-id in output
 ## swift-metrics
 
 Unified metrics API with pluggable backends.
-
-**Dependency**: `from: "2.5.0"` (current: 2.8.x)
 
 ### Metric Types
 
@@ -115,8 +99,6 @@ Compatible backends: SwiftPrometheus, StatsD Client, OpenTelemetry Swift.
 
 Distributed tracing API using `ServiceContext` for context propagation.
 
-**Dependency**: `from: "1.0.0"` (current: 1.4.x)
-
 ### Integration
 
 Built-in tracing support in:
@@ -137,9 +119,7 @@ Uses `ServiceContext` from `swift-service-context` (zero dependencies) for propa
 
 ## swift-service-lifecycle
 
-Manages graceful startup and shutdown of server applications.
-
-**Dependency**: `from: "2.0.0"` (current: 2.11.x)
+Manages graceful startup and shutdown of server applications. Note: 2.12+ requires Swift 6.1, and `ServiceGroup`'s logger parameter defaults to `Logger.current`.
 
 ### Service Protocol
 
@@ -182,8 +162,6 @@ try await serviceGroup.run()
 ## AsyncHTTPClient
 
 Production HTTP client for server-side Swift, built on SwiftNIO.
-
-**Dependency**: `from: "1.24.0"` (current: 1.33.x)
 
 ### Usage
 
@@ -228,12 +206,14 @@ Swift gRPC implementation, rewritten for Swift 6 concurrency.
 
 ### Multi-Repository Structure
 
-| Package | Purpose | Depend With |
+The v2 core now lives at **`grpc/grpc-swift-2`** — the 2.x line in the old `grpc/grpc-swift` repo is deprecated (it continues only as the v1 line). The companion packages are all on 2.x majors:
+
+| Package (repo) | Purpose | Depend With |
 |---------|---------|-------------|
-| `grpc-swift` | `GRPCCore` (transport-agnostic) | `from: "2.0.0"` |
-| `grpc-swift-nio-transport` | HTTP/2 transport on SwiftNIO | `from: "1.0.0"` |
-| `grpc-swift-protobuf` | SwiftProtobuf serialization | `from: "1.0.0"` |
-| `grpc-swift-extras` | Tracing middleware, etc. | `from: "1.0.0"` |
+| `grpc/grpc-swift-2` | `GRPCCore` (transport-agnostic) | `from: "2.0.0"` |
+| `grpc/grpc-swift-nio-transport` | HTTP/2 transport on SwiftNIO | `from: "2.0.0"` |
+| `grpc/grpc-swift-protobuf` | SwiftProtobuf serialization | `from: "2.0.0"` |
+| `grpc/grpc-swift-extras` | Tracing middleware, etc. | `from: "2.0.0"` |
 
 **Requirements**: Swift 6.0+, macOS 15.0+ (for NIO transport)
 
@@ -249,7 +229,7 @@ Swift gRPC implementation, rewritten for Swift 6 concurrency.
 
 Generates client and server code from OpenAPI 3.0/3.1/3.2 documents.
 
-**Package**: `apple/swift-openapi-generator` (current: 1.11.x)
+**Package**: `apple/swift-openapi-generator`
 
 ### Key Features
 

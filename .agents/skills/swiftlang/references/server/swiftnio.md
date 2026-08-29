@@ -185,23 +185,13 @@ let client = try await ClientBootstrap(group: group)
 
 ## ByteBuffer
 
+The API is symmetric: `write*` appends, `read*` consumes (moves the reader index), `get*` peeks at an offset without moving it — for `String`, `Integer`, `Bytes`, and slices alike.
+
 ```swift
 var buffer = ByteBufferAllocator().buffer(capacity: 256)
-
-// Writing
-buffer.writeString("Hello")
 buffer.writeInteger(42, as: UInt32.self)
-buffer.writeBytes([0x01, 0x02, 0x03])
-
-// Reading (moves reader index)
-let str = buffer.readString(length: 5)
 let num = buffer.readInteger(as: UInt32.self)
-
-// Peeking (does not move reader index)
-let peek = buffer.getString(at: 0, length: 5)
-
-// Slicing
-let slice = buffer.readSlice(length: 10)  // Shares storage (CoW)
+let slice = buffer.readSlice(length: 10)  // shares storage (CoW) — cheap, but keeps the parent alive
 ```
 
 ---
@@ -288,21 +278,23 @@ let bound = NIOLoopBound(nonSendableValue, eventLoop: eventLoop)
 
 ```swift
 import NIOEmbedded
+import Testing
 
-let channel = EmbeddedChannel()
-try channel.pipeline.addHandler(MyHandler()).wait()  // .wait() is OK here — not a real EventLoop
+@Test func handlerTransformsInput() throws {
+    let channel = EmbeddedChannel()
+    try channel.pipeline.addHandler(MyHandler()).wait()  // .wait() is OK here — not a real EventLoop
 
-// Write inbound data
-var buffer = channel.allocator.buffer(capacity: 16)
-buffer.writeString("test input")
-try channel.writeInbound(buffer)
+    // Write inbound data
+    var buffer = channel.allocator.buffer(capacity: 16)
+    buffer.writeString("test input")
+    try channel.writeInbound(buffer)
 
-// Read the handler's output
-let output: ByteBuffer = try channel.readOutbound()!
-XCTAssertEqual(output.getString(at: 0, length: output.readableBytes), "expected output")
+    // Read the handler's output
+    let output: ByteBuffer = try #require(channel.readOutbound())
+    #expect(output.getString(at: 0, length: output.readableBytes) == "expected output")
 
-// Verify no errors
-XCTAssertNoThrow(try channel.finish())
+    _ = try channel.finish()  // throws if the pipeline reported errors
+}
 ```
 
 `EmbeddedEventLoop` provides a controllable EventLoop for testing time-dependent behavior:

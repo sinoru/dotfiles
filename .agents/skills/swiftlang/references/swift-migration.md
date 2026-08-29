@@ -30,32 +30,10 @@ This is the most impactful behavioral change. Any `nonisolated async` function d
 
 ## Patterns to Adopt
 
-### Concurrency
+The adoption checklist lives in SKILL.md ("Swift 6.x Key Patterns") — it is always in context, so it is not repeated here. Per-feature detail is in the matching `swift-6_x.md` file. Two adoption notes that only matter during migration:
 
-1. **Swift 6 language mode** — Enable per-module for data race safety
-2. **Module-level `defaultIsolation`** (6.2+) — `MainActor` as default for app targets eliminates boilerplate
-3. **`@concurrent` for parallel work** (6.2+) — Required since nonisolated async stays on caller's executor
-4. **`Task.immediate`** (6.2+) — Avoid scheduling overhead when isolation is compatible
-5. **`async defer`** (6.3+) — Clean resource cleanup in async contexts
-
-### Type System & Safety
-
-6. **Typed throws** (6.0+) — `throws(MyError)` for public API error contracts
-7. **`InlineArray` / `[N of Element]`** (6.2+) — Stack allocation for fixed-size buffers
-8. **`Span` over `UnsafeBufferPointer`** (6.2+) — Safe memory access with lifetime enforcement
-9. **`@nonexhaustive` on library enums** (6.3+) — Plan for extensibility in public API
-10. **Swift Testing** (6.0+) — Prefer `@Test` / `#expect` over XCTest for new test code
-
-### Interop & Modules
-
-11. **`internal import`** (6.0+) — Hide implementation dependencies. Future-proofs against default change.
-12. **`@c` for C interop** (6.3+) — Official attribute replacing `@_cdecl`
-13. **Module selectors `::`** (6.3+) — Cleaner than typealiases for disambiguation
-
-### Performance
-
-14. **`@inline(always)`** (6.3+) — Guaranteed inlining (was hint-only)
-15. **`@export(implementation)`** (6.3+) — Replaces `@_alwaysEmitIntoClient`
+- **Swift Testing** (6.0+): prefer `@Test` / `#expect` for new test code; migrate XCTest suites opportunistically, not as a big-bang rewrite.
+- **`Task.immediate`** (6.2+): when replacing `DispatchQueue.main.async` hops, this avoids re-introducing scheduling latency.
 
 ---
 
@@ -97,9 +75,12 @@ This is the most impactful behavioral change. Any `nonisolated async` function d
 |---|---|
 | Nonisolated async default changed (SE-0461) | Background execution requires explicit `@concurrent` |
 | Unavailability diagnostics relaxed | May cause new overload resolution ambiguities |
+| `@nonexhaustive` enum (SE-0487, shipped in 6.2.3) | External switch statements over an enum so marked need `@unknown default` |
 
 ### Swift 6.3
 
-| Change | Impact |
-|---|---|
-| `@nonexhaustive` enum | External switch statements need `@unknown default` |
+No major source-breaking changes. Deprecated spellings replaced (`@_cdecl` → `@c`, `@_alwaysEmitIntoClient` → `@export(implementation)`); the old underscored forms still compile.
+
+### Swift 6.4 (in development — not yet released)
+
+Expect a new warning for silently discarded results/errors of throwing `Task`s (SE-0520). See `references/swift-6_4.md` for the full preview.

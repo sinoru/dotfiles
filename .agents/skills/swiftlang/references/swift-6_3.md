@@ -55,40 +55,27 @@ Also resolves local shadowing. Works within macros.
 
 ## Language
 
-### @nonexhaustive Enum — SE-0487
+### weak let — SE-0481
 
-Mark a public enum as extensible in non-resilient libraries:
+Weak references can now be `let` constants — the *reference* is immutable even though the referent may still be deallocated. This unblocks `Sendable` conformance for classes with weak stored properties and makes explicit `weak` closure captures immutable like every other capture:
 
 ```swift
-@nonexhaustive
-public enum ConnectionState {
-    case connecting, connected, disconnected
-}
-
-// External code must handle unknown future cases:
-switch state {
-case .connecting: ...
-case .connected: ...
-case .disconnected: ...
-@unknown default: ...
+final class Observer: Sendable {
+    weak let target: Target?   // OK in 6.3 — was forced to be `var` before
 }
 ```
 
-Use `@nonexhaustive(warn)` for gradual adoption.
+### Clock Epochs — SE-0473
 
-### Async Defer — SE-0493
-
-`defer` blocks can now contain `await`:
+`ContinuousClock` and `SuspendingClock` gain a `systemEpoch` property — the system-specific "zero" instant (set at boot on most platforms). Enables uptime-style measurements and cross-process correlation on the same machine:
 
 ```swift
-func processFile() async throws {
-    let handle = try await openFile()
-    defer { await handle.close() }  // Implicitly awaited at scope exit
-    // ...
-}
+let uptime = ContinuousClock().now - ContinuousClock().systemEpoch
 ```
 
-Only available inside async functions.
+### Codable Error Descriptions — SE-0489
+
+`EncodingError` and `DecodingError` now conform to `CustomDebugStringConvertible` — printed decoding failures are human-readable (coding path, type, context) instead of the old nested-enum dump. No code change needed; stop writing custom Codable-error formatters.
 
 ### @section / @used — SE-0492
 
@@ -108,7 +95,19 @@ Use `#if objectFormat(ELF)` / `#if objectFormat(MachO)` for platform-specific se
 
 ### @inline(always) Guarantee — SE-0496
 
-Now guarantees inlining for direct calls (was hint-only). Compile error if impossible. Implicitly requires `@inlinable` for public functions.
+Now guarantees inlining for direct calls (was hint-only). Compile error if impossible. Implies `@inlinable` for `public`/`package` functions (not for `internal` and below).
+
+### @specialized — SE-0460
+
+Pre-generate specializations of a generic function for concrete types; the unspecialized entry point re-dispatches to them at runtime. Use for hot generic code whose call sites the optimizer can't see:
+
+```swift
+@specialized(where T == Int)
+@specialized(where T == Double)
+func sum<T: BinaryInteger>(_ values: [T]) -> T { ... }
+```
+
+Note the spelling is `@specialized` (the release blog's `@specialize` is a typo).
 
 ### @export — SE-0497
 
@@ -136,6 +135,4 @@ Controls how a function's implementation is shared:
 - **Android**: First official Swift SDK for Android. Swift Java / Swift Java JNI Core libraries.
 - **Embedded Swift**: Enhanced C interop, improved debugging
 
-## Breaking Changes
-
-- `@nonexhaustive` enum requires `@unknown default` in external switch statements
+Breaking changes by version: see `references/swift-migration.md`.

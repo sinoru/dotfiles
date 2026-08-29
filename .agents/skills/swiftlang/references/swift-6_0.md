@@ -108,9 +108,4 @@ Language subset for ARM and RISC-V bare-metal microcontrollers.
 
 Fully rewritten in Swift — unified cross-platform. `FoundationEssentials` for lightweight use.
 
-## Breaking Changes
-
-- Data race safety enforced in Swift 6 mode (warnings → errors)
-- Property wrapper actor isolation inference removed (SE-0401): `@Published` no longer implies `@MainActor`
-- `@Sendable` on instance methods of non-Sendable types disallowed (SE-0418)
-- Closure parameter syntax with only a type and no name rejected
+Breaking changes by version: see `references/swift-migration.md`.

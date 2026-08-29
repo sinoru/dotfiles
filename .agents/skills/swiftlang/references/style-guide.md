@@ -50,7 +50,7 @@ var someProperty: Int { return otherObject.value }
 
 ### Trailing Commas
 
-- **Required** in multi-line collection literals, parameter lists, generic parameters, closure capture lists, and tuple elements.
+- **Required** in multi-line collection literals. Also required in multi-line parameter lists, generic parameters, closure capture lists, and tuple elements **when the minimum toolchain is Swift 6.1+** (earlier compilers reject trailing commas outside collection literals).
 
 ### Switch Statements
 
@@ -77,16 +77,9 @@ var someProperty: Int { return otherObject.value }
 3. Continuation lines in vertically-oriented comma lists are indented **+4** from the original line.
 4. Opening `{` goes on the same line as the last continuation, unless that line is already +4 indented — then `{` on its own line to avoid visual blending.
 
-### Function Declarations
+### The Shape
 
-```swift
-func generateStars(
-    at location: Point,
-    count: Int
-) -> String {
-```
-
-Generic constraints with `where` — break before `where`, each constraint on its own line:
+Break each list element onto its own line; the closing delimiter and any `where` clause get their own lines:
 
 ```swift
 func index<Elements: Collection, Element>(
@@ -99,61 +92,7 @@ where
 {
 ```
 
-### Function Calls
-
-Each argument on its own line when wrapping, closing `)` always on its own line:
-
-```swift
-let idx = index(
-    of: element,
-    in: collection
-)
-```
-
-### Type & Extension Declarations
-
-Inheritance list each on its own line, `where` clause likewise:
-
-```swift
-class MyContainer<BaseCollection>:
-    MySuperclass,
-    MyProtocol,
-    SomeFrameworkProtocol
-where
-    BaseCollection: Collection,
-    BaseCollection.Element: Equatable
-{
-    // ...
-}
-```
-
-### Control Flow
-
-Break after keyword, indent conditions +4:
-
-```swift
-if
-    let galaxy,
-    galaxy.name == "Milky Way"
-{
-    // ...
-}
-```
-
-- Multi-line `guard` places `else` on a separate line; single-line keeps it together.
-- `for-where` wraps `where` to a new line if needed:
-
-```swift
-for element in collection
-    where element.hasVeryLongPropertyName
-{
-    // ...
-}
-```
-
-### Other Expressions
-
-Continuation lines +4 from original. If too complex, split into temporary variables.
+The same shape applies everywhere: function calls (each argument on its own line, closing `)` on its own line), type inheritance lists, and multi-clause conditions (break after `if`/`guard`, conditions +4, then `{` — or `else` for guard — on its own line). If an expression gets too complex to wrap cleanly, split it into temporary variables instead.
 
 ---
 
@@ -404,29 +343,14 @@ public extension String {
 
 ---
 
-## Concurrency Patterns
+## Concurrency Conventions
 
-### Isolation
+Language-level concurrency guidance (isolation models, `@concurrent`, migration) lives in the version references — see `swift-6_2.md` in particular. The conventions below are the review-time style rules:
 
-- **`@MainActor` for UI code and ViewModels.** Consider module-level `defaultIsolation` (Swift 6.2+) to apply this by default.
-- **`@concurrent`** (6.2+) to explicitly move async work off the caller's executor — nonisolated async functions now stay on the caller's executor by default.
-- **`nonisolated`** on types/extensions (6.1+) to cleanly opt out of inherited actor isolation.
-- Introduce **`actor`** only when you have non-Sendable mutable state to protect. Keep model classes on `@MainActor` or non-Sendable.
-- Prefer **`@MainActor` annotation** over `MainActor.run`.
-- Finish all mutations on non-Sendable objects before sending across isolation boundaries.
-
-### Sendable
-
-- **Value types** (struct, enum) with Sendable stored data are implicitly Sendable. Actors and `@MainActor` types likewise.
-- **Classes** must be `final` with immutable stored properties. Use `@unchecked Sendable` sparingly with manual synchronization.
-- Prefer keeping types **non-Sendable** to let the compiler prevent unsafe sharing.
-
-### Structured Concurrency
-
-- **`async let`** for fixed-count parallel work; **`TaskGroup`** for dynamic count.
-- In SwiftUI, prefer **`.task` modifier** over unmanaged `Task { }`.
-- **Cancellation is cooperative** — check with `Task.checkCancellation()` or `Task.isCancelled`.
-- **`Task.detached`** breaks isolation inheritance — use sparingly.
+- Introduce **`actor`** only when you have non-Sendable mutable state to protect; prefer keeping types **non-Sendable** so the compiler prevents unsafe sharing.
+- Sendable **classes** must be `final` with immutable stored properties. Use `@unchecked Sendable` sparingly, and document the manual synchronization that justifies it.
+- Prefer **`@MainActor` annotation** over `MainActor.run`; finish all mutations on non-Sendable objects before sending them across isolation boundaries.
+- **`async let`** for fixed-count parallel work; **`TaskGroup`** for dynamic count. **`Task.detached`** breaks isolation inheritance — use sparingly.
 - Never block the cooperative thread pool with semaphores or synchronous waits.
 
 ---

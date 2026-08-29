@@ -19,7 +19,8 @@ Reference for Vapor-specific APIs and patterns. Read this when writing or modify
 13. [Migrations](#migrations)
 14. [Authentication](#authentication)
 15. [Testing](#testing)
-16. [Docker Deployment](#docker-deployment)
+16. [Files API](#files-api)
+17. [Docker Deployment](#docker-deployment)
 
 ---
 
@@ -118,16 +119,6 @@ struct TodosController: RouteCollection {
         }
     }
 
-    func index(req: Request) async throws -> [Todo] {
-        try await Todo.query(on: req.db).all()
-    }
-
-    func create(req: Request) async throws -> Todo {
-        let todo = try req.content.decode(Todo.self)
-        try await todo.save(on: req.db)
-        return todo
-    }
-
     func show(req: Request) async throws -> Todo {
         guard let todo = try await Todo.find(req.parameters.get("id"), on: req.db) else {
             throw Abort(.notFound)
@@ -135,23 +126,9 @@ struct TodosController: RouteCollection {
         return todo
     }
 
-    func update(req: Request) async throws -> Todo {
-        guard let todo = try await Todo.find(req.parameters.get("id"), on: req.db) else {
-            throw Abort(.notFound)
-        }
-        let input = try req.content.decode(Todo.self)
-        todo.title = input.title
-        try await todo.save(on: req.db)
-        return todo
-    }
-
-    func delete(req: Request) async throws -> HTTPStatus {
-        guard let todo = try await Todo.find(req.parameters.get("id"), on: req.db) else {
-            throw Abort(.notFound)
-        }
-        try await todo.delete(on: req.db)
-        return .noContent
-    }
+    // index / create / update / delete follow the same shape:
+    // decode with req.content.decode, query with Todo.query/find(on: req.db),
+    // save/delete, return the model (Content) or an HTTPStatus (.noContent for delete)
 }
 ```
 
@@ -785,7 +762,7 @@ try await withApp(configure: configure) { app in
 }
 ```
 
-With a persistent test database, revert after the tests. `defer { try? await app.autoRevert() }` only compiles on Swift 6.3+ (async `defer`); on 6.0–6.2 wrap the tests in `do { ... } catch { try? await app.autoRevert(); throw error }` and revert on the success path as well.
+With a persistent test database, revert after the tests. Async `defer` is not available in any stable Swift release (it lands in 6.4 — see `references/swift-6_4.md`), so wrap the tests in `do { ... } catch { try? await app.autoRevert(); throw error }` and revert on the success path as well.
 
 ### Logging in Tests
 
@@ -797,9 +774,11 @@ swift run App serve --log debug
 export LOG_LEVEL=debug
 ```
 
-### Files API
+---
 
-Built on NIO's `NonBlockingFileIO`. All operations are non-blocking.
+## Files API
+
+Built on NIO's `NonBlockingFileIO`. All operations are non-blocking — never use `FileManager`/`Data(contentsOf:)` in a route handler.
 
 ```swift
 // Stream file as HTTP response (auto-sets ETag, Content-Type)
@@ -821,25 +800,12 @@ req.fileio.writeFile(ByteBuffer(string: "Hello"), at: "/path")
 
 ## Docker Deployment
 
-### Key Points
-
-- `vapor new` generates a multi-stage Dockerfile (build + slim runtime)
-- Default port: **8080**
-- Use environment variables for configuration in production:
-  - `DATABASE_HOST`, `DATABASE_NAME`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`
-  - `LOG_LEVEL`
-
-### Commands
+- `vapor new` generates a multi-stage Dockerfile (build stage + slim Ubuntu runtime image). Default port: **8080**.
+- Configure via environment variables (`DATABASE_HOST`/`_NAME`/`_USERNAME`/`_PASSWORD`, `LOG_LEVEL` — use `notice` or `info` in production), with `.env`/secrets management for credentials.
+- Expose a health check endpoint for orchestrator probes.
 
 ```bash
 docker compose build
 docker compose up app
 docker compose run migrate
 ```
-
-### Production Considerations
-
-- Use `.env` or secrets management for credentials — never hardcode in production
-- Multi-stage builds keep the runtime image small (slim Ubuntu base)
-- Set `LOG_LEVEL=notice` or `LOG_LEVEL=info` for production logging
-- Consider health check endpoints for orchestrator probes

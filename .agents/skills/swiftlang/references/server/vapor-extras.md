@@ -164,6 +164,8 @@ let microsoft = try await req.jwt.microsoft.verify() // MicrosoftIdentityToken
 try await app.jwt.keys.use(jwksJSON: json)
 ```
 
+JWTKit 5.x also supports post-quantum JWT algorithms (built on Swift Crypto's quantum-secure APIs) — relevant when a security policy mandates PQC readiness.
+
 ---
 
 ## APNS
@@ -209,54 +211,19 @@ try await req.apns.client.sendAlertNotification(
 
 ## Leaf Templating
 
-Swift-inspired template syntax with `#` tags. Package: `vapor/leaf` (4.0.0+).
+Swift-inspired template syntax with `#` tags. Package: `vapor/leaf` (4.0.0+). Pin **LeafKit ≥ 1.14.2** — earlier versions have known XSS vulnerabilities.
 
-### Setup
+### Setup & Rendering
 
 ```swift
 app.views.use(.leaf)
-```
-
-### Rendering
-
-```swift
 // In route handler
 return req.view.render("home", ["title": "Welcome", "items": items])
 ```
 
 ### Template Syntax
 
-```html
-<!-- Variables -->
-<h1>#(title)</h1>
-
-<!-- Conditionals -->
-#if(showBanner):
-    <div class="banner">Hello!</div>
-#elseif(showAlt):
-    <div>Alt content</div>
-#else:
-    <div>Default</div>
-#endif
-
-<!-- Loops -->
-<ul>
-#for(item in items):
-    <li>#(item.name)</li>
-#endfor
-</ul>
-
-<!-- Template inheritance -->
-#extend("base"):
-    #export("content"):
-        <p>Page-specific content</p>
-    #endexport
-#endextend
-```
-
-### Built-in Helpers
-
-`#count`, `#lowercased`, `#uppercased`, `#capitalized`, `#contains`, `#date`, `#unsafeHTML`, `#dumpContext`
+`#(title)` interpolates; `#if(cond): ... #elseif ... #else: ... #endif` and `#for(item in items): ... #endfor` control flow; `#extend("base")` + `#export("content")` for inheritance. Built-in helpers: `#count`, `#lowercased`, `#uppercased`, `#capitalized`, `#contains`, `#date`, `#unsafeHTML`, `#dumpContext`. Values are HTML-escaped by default — `#unsafeHTML` bypasses escaping, so never feed it user input.
 
 **Security:** `#unsafeHTML` bypasses HTML escaping — XSS risk with user input.
 

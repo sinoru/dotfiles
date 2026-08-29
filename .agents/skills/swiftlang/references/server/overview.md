@@ -6,8 +6,8 @@ Server-specific frameworks, architecture, and patterns for Vapor and the SwiftNI
 
 This overview covers core principles, project setup, and critical rules. For detailed API patterns, read the matching file (paths are relative to the skill root):
 
-- **`references/server/vapor.md`** — Routing, controllers, middleware, Fluent ORM & migrations, authentication, HTTP client, WebSocket, sessions, validation, content system, environment, error handling, server configuration, testing, Docker deployment. Read when writing or modifying Vapor application code.
-- **`references/server/vapor-extras.md`** — Queues (job system), JWT, APNS, Leaf templating, Redis, custom commands, Files API, Services/DI, distributed tracing middleware. Read when integrating these Vapor add-on packages.
+- **`references/server/vapor.md`** — Routing, controllers, middleware (incl. TracingMiddleware), Fluent ORM & migrations, authentication, HTTP client, WebSocket, sessions, validation, content system, environment, error handling, server configuration, testing, Files API (streaming), Docker deployment. Read when writing or modifying Vapor application code.
+- **`references/server/vapor-extras.md`** — Queues (job system), JWT, APNS, Leaf templating, Redis, custom commands, Services/DI. Read when integrating these Vapor add-on packages.
 - **`references/server/swiftnio.md`** — EventLoop, Channel, ChannelHandler, ChannelPipeline, Bootstrap, ByteBuffer, NIOAsyncChannel, Swift Concurrency bridging. Read when working at the NIO layer or debugging concurrency/performance issues.
 - **`references/server/ecosystem.md`** — swift-log, swift-metrics, swift-distributed-tracing, swift-service-lifecycle, AsyncHTTPClient, gRPC Swift 2, Swift OpenAPI Generator. Read when integrating observability, managing service lifecycle, or using these libraries (in servers, CLI tools, and daemons alike).
 
@@ -25,7 +25,7 @@ let package = Package(
     name: "MyApp",
     platforms: [.macOS(.v14)],
     dependencies: [
-        .package(url: "https://github.com/vapor/vapor.git", from: "4.76.0"),
+        .package(url: "https://github.com/vapor/vapor.git", from: "4.118.0"),
         .package(url: "https://github.com/vapor/fluent.git", from: "4.0.0"),
         .package(url: "https://github.com/vapor/fluent-postgres-driver.git", from: "2.0.0"),
     ],
@@ -37,8 +37,8 @@ let package = Package(
         ]),
         .testTarget(name: "AppTests", dependencies: [
             .target(name: "App"),
-            .product(name: "XCTVapor", package: "vapor"),
-            // Or for Swift Testing: .product(name: "VaporTesting", package: "vapor")
+            .product(name: "VaporTesting", package: "vapor"),
+            // Legacy XCTest suites: .product(name: "XCTVapor", package: "vapor")
         ]),
     ]
 )
@@ -127,43 +127,12 @@ func index(req: Request) async throws -> [User] {
 
 ## Server-Side Concurrency Patterns
 
-For general Swift concurrency concepts (actors, Sendable, structured concurrency, data race safety), see `SKILL.md` and `references/swift-6_0.md` through `references/swift-6_3.md`. This section covers server-specific patterns.
+For general Swift concurrency concepts (actors, Sendable, structured concurrency, data race safety), see `SKILL.md` and the `references/swift-6_x.md` files. The server-specific bridging tools live in **`references/server/swiftnio.md`** (code examples there):
 
-### EventLoop ↔ async/await Bridging
-
-```swift
-// EventLoopFuture → async/await
-let result = try await someFuture.get()
-// Warning: does NOT respect structured concurrency cancellation
-
-// async → EventLoopFuture
-let promise = req.eventLoop.makePromise(of: String.self)
-promise.completeWithTask { try await someAsyncFunction() }
-let future = promise.futureResult
-```
-
-### EventLoop as SerialExecutor
-
-SwiftNIO's EventLoop conforms to `SerialExecutor` (macOS 14+/iOS 17+), enabling actors to run on a specific EventLoop via `NIOSerialEventLoopExecutor`. This bridges structured concurrency with NIO's execution model.
-
-### NIOLoopBound
-
-For safely passing non-`Sendable` values that are bound to a specific EventLoop:
-
-```swift
-let bound = NIOLoopBound(nonSendableValue, eventLoop: eventLoop)
-// Safe to transfer across concurrency domains — access only on the bound EventLoop
-```
-
-### CPU-Intensive Work Offloading
-
-Never run heavy computation on an EventLoop. Offload to the thread pool:
-
-```swift
-try await req.application.threadPool.runIfActive(eventLoop: req.eventLoop) {
-    Bcrypt.hash(password, cost: 12)
-}
-```
+- **EventLoopFuture ↔ async/await bridging** — `try await future.get()` (does NOT respect structured-concurrency cancellation) and `promise.completeWithTask { }`
+- **EventLoop as SerialExecutor** — run actors on a specific EventLoop via `NIOSerialEventLoopExecutor`
+- **NIOLoopBound** — safely pass non-`Sendable` values bound to one EventLoop
+- **CPU offloading** — never run heavy computation on an EventLoop; use the thread-pool pattern from Principle 1 above
 
 ---
 
@@ -171,81 +140,12 @@ try await req.application.threadPool.runIfActive(eventLoop: req.eventLoop) {
 
 Vapor 4.118.0+ requires Swift 6.0. For general Swift 6 migration guidance (data race safety, Sendable theory, breaking changes by version), see `references/swift-migration.md`. Below are Vapor/NIO-specific changes.
 
-### Sendable Requirements (Vapor-Specific)
+Vapor/NIO-specific changes, with code examples in the detail files:
 
-`Content` and `View` protocols now have Sendable requirements (breaking change in 4.107.0). Fluent models need `@unchecked Sendable` because property wrappers (`@Field`, `@ID`, etc.) are not Sendable:
-
-```swift
-final class User: Model, Content, @unchecked Sendable {
-    static let schema = "users"
-    @ID(key: .id) var id: UUID?
-    @Field(key: "name") var name: String
-    init() { }
-}
-```
-
-Alternatively, use a separate DTO struct for API responses (avoids exposing model internals):
-
-```swift
-final class User: Model, @unchecked Sendable { ... }
-
-struct UserResponse: Content {  // Content implies Sendable — structs are fine
-    let id: UUID
-    let name: String
-}
-```
-
-### Deprecated Blocking APIs
-
-`Application.init()` (synchronous) is deprecated since 4.113.0. Use async initialization:
-
-```swift
-// Deprecated
-let app = Application()
-
-// Preferred
-let app = try await Application.make()
-defer { try await app.asyncShutdown() }
-```
-
-### VaporTesting (Swift Testing)
-
-New `VaporTesting` module (4.110.0+) replaces `XCTVapor` for Swift Testing compatibility:
-
-```swift
-import VaporTesting
-
-@Test func helloWorld() async throws {
-    try await withApp(configure: configure) { app in
-        try await app.testing().test(.GET, "hello") { res in
-            #expect(res.status == .ok)
-            #expect(res.body.string == "Hello, world!")
-        }
-    }
-}
-```
-
-| Deprecated (XCTVapor) | Replacement (VaporTesting) |
-|----------------------|---------------------------|
-| `XCTAssertContent` | `expectContent` |
-| `XCTAssertContains` | `expectContains` |
-| `XCTAssertEqualJSON` | `expectEqualJSON` |
-| `app.testable()` | `app.testing()` |
-
-### NIOAsyncChannel (SwiftNIO)
-
-The recommended async-first Channel API. Deprecated `.inbound`/`.outbound` properties in favor of `executeThenClose`:
-
-```swift
-let channel = try NIOAsyncChannel<ByteBuffer, ByteBuffer>(
-    wrappingChannelSynchronously: rawChannel
-)
-try await channel.executeThenClose { inbound, outbound in
-    for try await buffer in inbound {
-        try await outbound.write(buffer)
-    }
-}
-```
+- **Sendable requirements** (breaking in 4.107.0): `Content` and `View` are `Sendable`. Fluent models are declared `final class … Model, Content, @unchecked Sendable` (property wrappers aren't Sendable) with an empty `init() {}`; a DTO `struct` conforming to `Content` is the cleaner shape for API responses. See "Model Definition" in `vapor.md`.
+- **Deprecated blocking APIs** (4.113.0): synchronous `Application()` is deprecated — use `try await Application.make()` + `try await app.asyncShutdown()`.
+- **VaporTesting** (4.110.0+): Swift Testing support via `withApp` / `app.testing()`, replacing `XCTVapor`/`app.testable()`. See "Testing" in `vapor.md` for the full example and the XCTVapor→VaporTesting rename table.
+- **NIOAsyncChannel**: the async-first Channel API — `executeThenClose` replaces the deprecated `.inbound`/`.outbound` properties. See `swiftnio.md`.
 
 ---
 
@@ -268,20 +168,25 @@ try await channel.executeThenClose { inbound, outbound in
 
 ## Version Reference
 
+This table is the **single source of truth for versions** in this directory — the other files intentionally do not repeat version pins. Verified 2026-08; versions rot, so double-check the package's releases page when precision matters.
+
 | Package | Current Version | Swift Requirement | Depend With |
 |---------|----------------|-------------------|-------------|
-| Vapor | 4.121.x | Swift 6.0+ | `from: "4.76.0"` |
-| SwiftNIO | 2.97.x | Swift 6.0+ (2.87+) | `from: "2.0.0"` |
-| Fluent | 4.x | Swift 5.8+ | `from: "4.0.0"` |
+| Vapor | 4.122.x | Swift 6.0+ (4.118+) | `from: "4.118.0"` |
+| SwiftNIO | 2.101.x | Swift 6.0+ (2.87+) | `from: "2.81.0"` |
+| Fluent | 4.13.x | Swift 6.0+ (4.13+) | `from: "4.0.0"` |
 | FluentPostgresDriver | 2.x | Swift 5.8+ | `from: "2.0.0"` |
 | JWT (vapor/jwt) | 5.x | Swift 6.0+ | `from: "5.0.0"` |
 | Queues Redis Driver | 1.x | Swift 5.9+ | `from: "1.0.0"` |
 | APNS (vapor/apns) | 4.x | Swift 5.9+ | `from: "4.0.0"` |
-| Leaf | 4.x | Swift 5.8+ | `from: "4.0.0"` |
-| Redis (vapor/redis) | 4.x | Swift 5.8+ | `from: "4.0.0"` |
-| AsyncHTTPClient | 1.33.x | Swift 6.0+ | `from: "1.24.0"` |
-| swift-log | 1.11.x | Swift 5.8+ | `from: "1.6.0"` |
-| swift-metrics | 2.8.x | Swift 5.8+ | `from: "2.5.0"` |
-| swift-service-lifecycle | 2.11.x | Swift 6.0+ | `from: "2.0.0"` |
+| Leaf | 4.x (LeafKit ≥ 1.14.2 — XSS fixes) | Swift 5.8+ | `from: "4.0.0"` |
+| Redis (vapor/redis) | 4.14.x | Swift 5.8+ | `from: "4.0.0"` |
+| AsyncHTTPClient | 1.36.x | Swift 6.0+ | `from: "1.24.0"` |
+| swift-log | 1.15.x | Swift 5.8+ | `from: "1.6.0"` |
+| swift-metrics | 2.11.x | Swift 5.8+ | `from: "2.5.0"` |
+| swift-service-lifecycle | 2.12.x | Swift 6.1+ (2.12+) | `from: "2.0.0"` |
+| grpc-swift-2 (repo: `grpc/grpc-swift-2`) | 2.4.x | Swift 6.0+ | `from: "2.0.0"` |
+
+**Vapor 5** is in early alpha (`5.0.0-alpha.x`) — a ground-up rewrite on structured concurrency with macro-based type-safe routing. Vapor 4 remains the supported production line; do not suggest Vapor 5 for real projects yet.
 
 Upstream sources for the files in this directory (Vapor docs, swift.org server documentation, package READMEs) are listed under **Upstream Sources** in `SKILL.md`.
