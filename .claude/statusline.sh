@@ -113,13 +113,33 @@ _add_period() {
   resets_at=$(echo "$usage_json" | jq -r "${jq_path}.resets_at // empty")
   [[ -z "$util" ]] && return
   local color remaining
-  color=$(_util_color "$util" 80 95)
+  color=$(_util_color "$util" 70 90)
   remaining=$(_fmt_remaining "$resets_at")
   local int_util
   int_util=$(printf '%.0f' "$util")
   local seg="${label}: ${color}${int_util}%${RST}"
   [[ -n "$remaining" ]] && seg+=" ${DIM}(${remaining})${RST}"
   echo "$seg"
+}
+
+# _add_scoped_weekly <usage_json> — model-scoped weekly limits (.limits[]), one segment per line
+_add_scoped_weekly() {
+  local usage_json="$1"
+  echo "$usage_json" | jq -c '.limits[]? | select(.kind == "weekly_scoped" and .scope.model.display_name != null)' |
+  while IFS= read -r entry; do
+    local label percent resets_at
+    label=$(echo "$entry" | jq -r '.scope.model.display_name')
+    percent=$(echo "$entry" | jq -r '.percent // empty')
+    resets_at=$(echo "$entry" | jq -r '.resets_at // empty')
+    [[ -z "$percent" ]] && continue
+    local color remaining int_pct
+    color=$(_util_color "$percent" 70 90)
+    remaining=$(_fmt_remaining "$resets_at")
+    int_pct=$(printf '%.0f' "$percent")
+    local seg="${label}: ${color}${int_pct}%${RST}"
+    [[ -n "$remaining" ]] && seg+=" ${DIM}(${remaining})${RST}"
+    echo "$seg"
+  done
 }
 
 # Build Line 4
@@ -129,10 +149,11 @@ _build_usage_line() {
   local sep=" ${DIM}|${RST} "
   local seg
 
-  seg=$(_add_period "5h"     ".five_hour"        "$usage_json"); [[ -n "$seg" ]] && parts+=("$seg")
-  seg=$(_add_period "7d"     ".seven_day"        "$usage_json"); [[ -n "$seg" ]] && parts+=("$seg")
-  seg=$(_add_period "Sonnet" ".seven_day_sonnet" "$usage_json"); [[ -n "$seg" ]] && parts+=("$seg")
-  seg=$(_add_period "Opus"   ".seven_day_opus"   "$usage_json"); [[ -n "$seg" ]] && parts+=("$seg")
+  seg=$(_add_period "5h" ".five_hour" "$usage_json"); [[ -n "$seg" ]] && parts+=("$seg")
+  seg=$(_add_period "7d" ".seven_day" "$usage_json"); [[ -n "$seg" ]] && parts+=("$seg")
+  while IFS= read -r seg; do
+    [[ -n "$seg" ]] && parts+=("$seg")
+  done < <(_add_scoped_weekly "$usage_json")
 
   local extra_enabled
   extra_enabled=$(echo "$usage_json" | jq -r '.extra_usage.is_enabled // false')
@@ -146,7 +167,7 @@ _build_usage_line() {
       used_fmt=$(printf '%.2f' "$(echo "$used / 100" | bc -l 2>/dev/null || echo 0)")
       limit_fmt=$(printf '%.2f' "$(echo "$limit / 100" | bc -l 2>/dev/null || echo 0)")
       local color=""
-      [[ -n "$util_pct" ]] && color=$(_util_color "$util_pct" 80 95)
+      [[ -n "$util_pct" ]] && color=$(_util_color "$util_pct" 70 90)
       local seg="${color}\$${used_fmt}/\$${limit_fmt}${RST}"
       [[ -n "$util_pct" ]] && seg+=" ${DIM}($(printf '%.0f' "$util_pct")%)${RST}"
       parts+=("$seg")
@@ -203,7 +224,7 @@ usage_json=""
 
 # === Rendering ===
 
-pct_color=$(_util_color "$pct" 70 90)
+pct_color=$(_util_color "$pct" 60 80)
 
 display_dir="${dir/#$HOME/~}"
 line1="${CYN}📂 ${display_dir}${RST}"
