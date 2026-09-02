@@ -6,6 +6,7 @@
   "permissions": {
     "defaultMode": "auto"
   },
+  "enableArtifact": false,
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
