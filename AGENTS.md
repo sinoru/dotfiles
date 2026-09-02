@@ -1,36 +1,36 @@
 # Personal Development Rules
 
-## 1. 쓰기 작업 정책
+## 1. Write Operation Policy
 
-- **절대로 먼저 실행하지 않는다.** 코드 수정, 파일 생성, GitHub 코멘트·PR 작성, 외부 서비스 게시 등 모든 쓰기 작업은 명시적 지시("수정해", "고쳐", "작성해", "올려" 등)가 없는 한, 반드시 초안 또는 변경 계획을 먼저 제시하고 컨펌을 받은 뒤 실행한다.
+- **Never act first.** For every write operation (code changes, file creation, GitHub comments and PRs, publishing to external services, etc.), unless there is an explicit instruction such as "modify it", "fix it", "write it", or "post it", always present a draft or change plan first and execute only after confirmation.
 
-## 2. 정보 검증 정책
+## 2. Information Verification Policy
 
-- 표준, 스펙, 공식 문서에 대한 질문이나 확인이 필요한 경우, **추측하지 말고 직접 검색하여 확인**한다.
-- 특히 다음 항목은 반드시 검색 후 답변한다:
-  - API 동작이나 제약사항
-  - RFC, W3C 등 기술 표준의 구체적 내용
-  - 법률, 규정, 공식 절차 관련 사항
-- 불확실한 정보는 "확실하지 않다"고 명시하고, 검증 가능한 출처를 안내한다.
+- When a question or check concerns standards, specs, or official documentation, **do not guess; search and verify directly**.
+- In particular, always search before answering on the following:
+  - API behavior or constraints
+  - Specific contents of technical standards such as RFC or W3C
+  - Laws, regulations, and official procedures
+- For uncertain information, state explicitly that it is "not certain" and point to a verifiable source.
 
-## 3. 커뮤니케이션 스타일
+## 3. Communication Style
 
-- 한국어로 대화한다. 기술 용어는 영문 원어를 병기해도 좋다.
-- 불필요하게 장황하지 않게, 핵심 위주로 답변한다.
-- 버전 관리 툴의 커밋 메시지는 기본적으로 영어로 작성한다.
+- Converse in Korean. Technical terms may be accompanied by their original English form.
+- Avoid unnecessary verbosity; focus answers on the essentials.
+- Version control commit messages are written in English by default.
 
-## 4. 도구 사용 정책
+## 4. Tool Usage Policy
 
-- **Bash 허용 목록**: Bash는 아래 나열된 용도로만 사용한다. 그 외 모든 작업은 전용 도구(Read, Edit, Write, Glob, Grep 등)를 사용한다. 목록에 없는 명령이 필요한 경우, 먼저 사용자에게 확인을 받는다.
+- **Bash allowlist**: Use Bash only for the purposes listed below. For everything else, use the dedicated tools (Read, Edit, Write, Glob, Grep, etc.). If a command not on the list is needed, get the user's confirmation first.
   - `git`
 
-## 5. 코드 변경 습관
+## 5. Code Change Habits
 
-- **Dead code 정리**: 버그 수정이나 리팩토링 시 대체된 기존 로직은 완전히 제거한다. 새 구현 옆에 비활성 코드를 남기지 않는다.
-- **기존 코드베이스 검색 우선**: 수정이나 새 기능 제안 전에, 기존 코드베이스에 유사 패턴·유틸리티·브릿지가 있는지 Grep/Glob으로 먼저 확인한다. "없다"고 주장하기 전에 반드시 검색한다. 유사한 구현이 여러 개 발견되면, 후보 목록을 제시하고 어떤 것을 활용할지 사용자에게 확인한다.
-- **빌드 및 테스트 검증**: 코드 변경 후 빌드/컴파일 및 테스트 검증이 가능한 환경이면 반드시 수행한다. 오류뿐 아니라 경고도 확인하고, 발견 시 즉시 수정하여 성공을 확인한 뒤 작업을 완료한다.
-- **API 버전 분기 전략**: 최신 API를 기본 구현으로 사용하고, deprecated 또는 이전 버전 지원은 별도 분기로 격리한다. 해당 지원이 불필요해지면 분기 코드만 제거할 수 있도록 구조화한다.
+- **Dead code cleanup**: When fixing bugs or refactoring, completely remove the existing logic that was replaced. Do not leave inactive code next to the new implementation.
+- **Search the existing codebase first**: Before proposing a change or new feature, check with Grep/Glob whether the existing codebase already has a similar pattern, utility, or bridge. Always search before claiming "there is none". If multiple similar implementations are found, present the candidates and ask the user which one to use.
+- **Build and test verification**: After code changes, always run build/compile and test verification if the environment allows it. Check warnings as well as errors; fix any found immediately, confirm success, and only then complete the task.
+- **API version branching strategy**: Use the latest API as the default implementation, and isolate support for deprecated or older versions in a separate branch. Structure it so that only the branch code needs to be removed once that support is no longer necessary.
 
-## 6. Git 작업 규칙
+## 6. Git Workflow Rules
 
-- **index.lock 처리**: `git index.lock` 에러 발생 시, 먼저 실행 중인 git 프로세스가 있는지 확인한다. git 프로세스가 없으면 stale lock 파일을 삭제하고 재시도한다. git 프로세스가 실행 중이면 사용자에게 알린다.
+- **Handling index.lock**: On a `git index.lock` error, first check whether a git process is running. If no git process is running, delete the stale lock file and retry. If a git process is running, notify the user.
