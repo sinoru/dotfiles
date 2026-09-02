@@ -1,21 +1,20 @@
 ---
 name: swiftlang
 description: >-
-  Use for any task where Swift code is the artifact being produced, changed,
-  judged, or shipped. This covers: writing, reviewing, refactoring, or
-  debugging .swift files; API and naming review before tagging a release;
-  error handling, doc comments, and idiom checks; concurrency, Sendable, and
-  Swift 6 language-mode migration; Package.swift, targets, dependencies, and
-  build settings; and server-side Swift work with Vapor, Fluent, SwiftNIO,
-  AsyncHTTPClient, or SSWG packages — including how such a service is built,
-  containerized, configured, and deployed (Dockerfile, static linking, health
-  checks, env config), since those choices follow from the Swift toolchain
-  and package graph.
-
-  Skip it when nothing Swift-authored is at stake: installing or switching
-  toolchains, shell PATH setup, Xcode project settings, signing and
-  provisioning, generic CI plumbing with no Swift build involved, plain Apple
-  framework doc lookups, UI/design questions, and code in other languages.
+  Load this before you explore, read, or edit anything in a Swift codebase —
+  one with Package.swift, an .xcodeproj, or .swift files under Sources/ or
+  Tests/. That includes tasks that never say "Swift": a bug report or GitHub
+  issue to fix, a flaky test, a feature to implement, a README or CI workflow
+  for a Swift package, or a SwiftUI/UIKit screen to fix (use it together with
+  apple-platform there). Every app for an Apple platform counts, Objective-C
+  files included. No edit is too small: adding a property, renaming a method,
+  adding an enum case. It carries the naming, idiom, concurrency, and testing
+  rules every Swift change must follow, plus Swift 6 and Sendable migration,
+  XCTest to Swift Testing, macros, Package.swift and dependencies, toolchain
+  and swiftly/PATH questions, Swift language features, evolution proposals,
+  and WWDC sessions, and server-side Swift (Vapor, Fluent, SwiftNIO, SSWG)
+  including performance and deployment. Not for other languages, Xcode
+  signing, pbxproj, or TestFlight administration.
 ---
 
 # Swift Language Guide
