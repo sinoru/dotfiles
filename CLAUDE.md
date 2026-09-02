@@ -20,18 +20,7 @@ macOS용 개인 dotfiles 저장소. 홈 디렉토리의 설정 파일들을 이 
 
 ### Modular Utilities (`.zshrc.d/`)
 
-모든 셸 함수는 기능별로 개별 `.zsh` 파일에 분리. 새 유틸리티 추가 시 `.zshrc.d/`에 `기능명.zsh` 파일을 생성하면 자동 로드된다. `.zshrc`를 직접 수정할 필요 없음.
-
-| 파일 | 함수 | 용도 | 주요 의존성 |
-|------|------|------|-------------|
-| `antidote.zsh` | — | Zsh 플러그인 매니저 초기화 | Homebrew antidote |
-| `convav.zsh` | `convav <in> <out> [opts]` | AV1(SVT-AV1) + FLAC 변환 | ffmpeg, ffprobe |
-| `cmpv.zsh` | `cmpv <lhs> <rhs>` | 영상 품질 비교 (SSIM, PSNR, VMAF) | ffmpeg, ffprobe |
-| `cmpi.zsh` | `cmpi <dir1> <dir2>` | 이미지 쌍 비교 | — |
-| `hlsdump.zsh` | `hlsdump <url> [output.ts]` | HLS 스트림 다운로드 (최고 품질 자동 선택) | ffmpeg, ffprobe, jq |
-| `md.zsh` | `mdsync`, `mdsource` | macOS 확장 속성(xattr) 관리 | xattr, plutil |
-| `optimpng.zsh` | `optimpng` | PNG 최적화 | oxipng |
-| `dive.zsh` | `dive` | Docker 이미지 탐색 (locale 수정) | dive |
+모든 셸 함수는 기능별로 개별 `.zsh` 파일에 분리. 각 파일은 파일명과 같은 이름의 함수를 정의한다. 새 유틸리티 추가 시 `.zshrc.d/`에 `기능명.zsh` 파일을 생성하면 자동 로드된다. `.zshrc`를 직접 수정할 필요 없음.
 
 ### CPU-Aware Parallelism
 
@@ -42,10 +31,6 @@ macOS용 개인 dotfiles 저장소. 홈 디렉토리의 설정 파일들을 이 
 ### Plugin Management
 
 Antidote(Homebrew 설치)로 Zsh 플러그인 관리. 플러그인 목록은 `.zsh_plugins.txt`에 정의.
-
-### Claude Code Configuration (`.claude/`)
-
-`settings.json`, `CLAUDE.md`(글로벌 지침), `skills/`(커스텀 스킬), `statusline.sh`
 
 ## Conventions
 
