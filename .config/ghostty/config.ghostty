@@ -46,3 +46,4 @@ macos-titlebar-style = native
 bold-color = #EDEDED
 bell-features = system,no-audio,attention,title,no-border
 auto-update = check
+auto-update-channel = tip
