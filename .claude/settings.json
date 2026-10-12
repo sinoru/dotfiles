@@ -6,6 +6,7 @@
   "permissions": {
     "defaultMode": "auto"
   },
+  "model": "opus",
   "enableArtifact": false,
   "statusLine": {
     "type": "command",
@@ -15,7 +16,8 @@
     "swift-lsp@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
     "codex@openai-codex": true,
-    "clangd-lsp@claude-plugins-official": true
+    "clangd-lsp@claude-plugins-official": true,
+    "cc-plugin-you-should-know@builtin": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
@@ -54,14 +56,11 @@
   },
   "effortLevel": "high",
   "modelSettings": {
-    "claude-fable-5": {
-      "effortLevel": "high"
-    },
-    "claude-opus-5": {
-      "effortLevel": "high"
-    },
     "claude-fable-5-1": {
       "effortLevel": "high"
+    },
+    "claude-opus-5-5": {
+      "effortLevel": "xhigh"
     }
   },
   "promptSuggestionEnabled": false,
@@ -72,5 +71,5 @@
   "remoteControlAtStartup": false,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
-  "useAutoModeDuringPlan": false
+  "useAutoModeDuringPlan": true
 }
