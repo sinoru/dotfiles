@@ -55,14 +55,6 @@
     ]
   },
   "effortLevel": "high",
-  "modelSettings": {
-    "claude-fable-5-1": {
-      "effortLevel": "high"
-    },
-    "claude-opus-5-5": {
-      "effortLevel": "xhigh"
-    }
-  },
   "promptSuggestionEnabled": false,
   "tui": "fullscreen",
   "theme": "auto",
